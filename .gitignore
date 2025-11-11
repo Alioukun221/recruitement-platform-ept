@@ -1,0 +1,31 @@
+# Global
+.DS_Store
+*.tmp
+*.log
+*.swp
+*.iml
+*.class
+
+# Maven
+backend/target/
+
+# IntelliJ / Eclipse / VSCode
+.idea/
+*.iws
+*.ipr
+*.iml
+.vscode/
+
+# Java
+*.jar
+*.war
+
+# Angular
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/cache/
+
+# Environment
+*.env
+
+
