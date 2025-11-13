@@ -3,6 +3,7 @@ package com.ept.sn.cri.backend.commission.controller;
 import com.ept.sn.cri.backend.commission.dto.*;
 import com.ept.sn.cri.backend.commission.service.CommissionMemberService;
 import com.ept.sn.cri.backend.entity.User;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +23,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/commission-member")
 @RequiredArgsConstructor
+@Tag(name="Membre de commission (notations && commentaires)")
 public class CommissionMemberController {
 
     private final CommissionMemberService commissionMemberService;
@@ -29,6 +32,7 @@ public class CommissionMemberController {
      * Obtenir mes commissions
      * GET /api/v1/commission-member/my-commissions
      */
+    @PreAuthorize("hasAuthority('COMMISSION_MEMBER')")
     @GetMapping("/my-commissions")
     public ResponseEntity<List<MemberCommissionDTO>> getMyCommissions(
             @AuthenticationPrincipal User user) {
@@ -41,6 +45,7 @@ public class CommissionMemberController {
      * Obtenir les candidats présélectionnés d'une commission
      * GET /api/v1/commission member/commissions/{commissionId}/applications
      */
+    @PreAuthorize("hasAuthority('COMMISSION_MEMBER')")
     @GetMapping("/commissions/{commissionId}/applications")
     public ResponseEntity<List<CommissionApplicationListDTO>> getShortlistedApplications(
             @PathVariable Long commissionId,
@@ -56,6 +61,7 @@ public class CommissionMemberController {
      * Obtenir les détails complets d'un candidat
      * GET /api/v1/commission member/commissions/{commissionId}/applications/{applicationId}
      */
+    @PreAuthorize("hasAuthority('COMMISSION_MEMBER')")
     @GetMapping("/commissions/{commissionId}/applications/{applicationId}")
     public ResponseEntity<CommissionApplicationDetailDTO> getApplicationDetails(
             @PathVariable Long commissionId,
@@ -72,6 +78,7 @@ public class CommissionMemberController {
      * Visualiser le CV d'un candidat
      * GET /api/v1/commission-member/commissions/{commissionId}/applications/{applicationId}/cv
      */
+    @PreAuthorize("hasAuthority('COMMISSION_MEMBER')")
     @GetMapping("/commissions/{commissionId}/applications/{applicationId}/cv")
     public ResponseEntity<Resource> viewCV(
             @PathVariable Long commissionId,
@@ -118,6 +125,7 @@ public class CommissionMemberController {
      * Évaluer un candidat
      * POST /api/v1/commission-member/commissions/{commissionId}/applications/{applicationId}/evaluate
      */
+    @PreAuthorize("hasAuthority('COMMISSION_MEMBER')")
     @PostMapping("/commissions/{commissionId}/applications/{applicationId}/evaluate")
     public ResponseEntity<EvaluationResponseDTO> evaluateApplication(
             @PathVariable Long commissionId,
@@ -136,6 +144,7 @@ public class CommissionMemberController {
      * Modifier mon évaluation
      * PUT /api/v1/commission-member/commissions/{commissionId}/applications/{applicationId}/evaluate
      */
+    @PreAuthorize("hasAuthority('COMMISSION_MEMBER')")
     @PutMapping("/commissions/{commissionId}/applications/{applicationId}/evaluate")
     public ResponseEntity<EvaluationResponseDTO> updateMyEvaluation(
             @PathVariable Long commissionId,
@@ -155,6 +164,7 @@ public class CommissionMemberController {
      * Obtenir mon évaluation pour un candidat
      * GET /api/v1/commission-member/commissions/{commissionId}/applications/{applicationId}/my-evaluation
      */
+    @PreAuthorize("hasAuthority('COMMISSION_MEMBER')")
     @GetMapping("/commissions/{commissionId}/applications/{applicationId}/my-evaluation")
     public ResponseEntity<EvaluationResponseDTO> getMyEvaluation(
             @PathVariable Long commissionId,
@@ -172,6 +182,7 @@ public class CommissionMemberController {
      * Supprimer mon évaluation
      * DELETE /api/v1/commission-member/commissions/{commissionId}/applications/{applicationId}/my-evaluation
      */
+    @PreAuthorize("hasAuthority('COMMISSION_MEMBER')")
     @DeleteMapping("/commissions/{commissionId}/applications/{applicationId}/my-evaluation")
     public ResponseEntity<Void> deleteMyEvaluation(
             @PathVariable Long commissionId,

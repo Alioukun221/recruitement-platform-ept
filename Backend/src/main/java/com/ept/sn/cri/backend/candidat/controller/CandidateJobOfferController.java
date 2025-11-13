@@ -3,10 +3,12 @@ package com.ept.sn.cri.backend.candidat.controller;
 import com.ept.sn.cri.backend.candidat.dto.*;
 import com.ept.sn.cri.backend.candidat.service.CandidateJobOfferService;
 import com.ept.sn.cri.backend.entity.User;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/candidate")
 @RequiredArgsConstructor
+@Tag(name="Candidats")
 public class CandidateJobOfferController {
 
     private final CandidateJobOfferService candidateJobOfferService;
@@ -55,6 +58,7 @@ public class CandidateJobOfferController {
      * Soumettre une candidature (PROTÉGÉ)
      * Nécessite une authentification avec rôle CANDIDATE
      */
+    @PreAuthorize("hasAuthority('CANDIDATE')")
     @PostMapping(value = "/job-offers/{jobOfferId}/apply", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApplicationSubmissionResponseDTO> submitApplication(
             @PathVariable Long jobOfferId,
@@ -84,6 +88,7 @@ public class CandidateJobOfferController {
      * Obtenir l'historique des candidatures du candidat connecté (PROTÉGÉ)
      * Nécessite une authentification avec rôle CANDIDATE
      */
+    @PreAuthorize("hasAuthority('CANDIDATE')")
     @GetMapping("/my-applications")
     public ResponseEntity<List<CandidateApplicationHistoryDTO>> getMyApplications(
             @AuthenticationPrincipal User user) {
@@ -98,6 +103,7 @@ public class CandidateJobOfferController {
      * Obtenir les détails d'une candidature spécifique (PROTÉGÉ)
      * Nécessite une authentification avec rôle CANDIDATE
      */
+    @PreAuthorize("hasAuthority('CANDIDATE')")
     @GetMapping("/my-applications/{applicationId}")
     public ResponseEntity<CandidateApplicationDetailDTO> getMyApplicationDetail(
             @PathVariable Long applicationId,
@@ -114,6 +120,7 @@ public class CandidateJobOfferController {
      * Nécessite une authentification avec rôle CANDIDATE
      * je ne pense pas que c'est une methode necessaire mais bon laissons
      */
+    @PreAuthorize("hasAuthority('CANDIDATE')")
     @DeleteMapping("/my-applications/{applicationId}")
     public ResponseEntity<Void> withdrawApplication(
             @PathVariable Long applicationId,

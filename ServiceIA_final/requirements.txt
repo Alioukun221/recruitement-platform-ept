@@ -1,0 +1,26 @@
+# Framework Web
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+
+# Client Mistral AI
+mistralai==1.9.10
+
+# Modèles de données
+ pydantic==2.10.3
+pydantic-settings==2.6.0
+
+# Client HTTP asynchrone
+httpx >= 0.28.1
+
+# Retry logic
+tenacity==9.0.0
+
+# Configuration
+python-dotenv==1.0.1
+
+# Logging
+python-json-logger==3.1.0
+
+# CORS et middleware
+python-multipart==0.0.17
+

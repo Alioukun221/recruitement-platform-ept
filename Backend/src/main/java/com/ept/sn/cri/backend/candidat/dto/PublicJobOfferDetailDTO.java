@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -24,7 +25,7 @@ public class PublicJobOfferDetailDTO {
     private String niveauEtudeRequis;
     private Integer experienceMin;
     private Date datePublication;
-    private Date dateLimite;
+    private LocalDateTime dateLimite;
     private Integer applicationCount;
     private String companyName; // a changer apres
 }

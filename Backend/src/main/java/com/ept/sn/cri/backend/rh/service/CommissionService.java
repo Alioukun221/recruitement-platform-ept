@@ -5,6 +5,9 @@ import com.ept.sn.cri.backend.auth.repository.UserRepository;
 import com.ept.sn.cri.backend.entity.*;
 import com.ept.sn.cri.backend.enums.CommissionRole;
 import com.ept.sn.cri.backend.enums.CommissionStatus;
+import com.ept.sn.cri.backend.exception.InvalidActionException;
+import com.ept.sn.cri.backend.exception.ResourceNotFoundException;
+import com.ept.sn.cri.backend.exception.UnauthorizedActionException;
 import com.ept.sn.cri.backend.rh.dto.*;
 import com.ept.sn.cri.backend.rh.repository.CommissionMemberRepository;
 import com.ept.sn.cri.backend.rh.repository.CommissionRepository;
@@ -64,15 +67,15 @@ public class CommissionService {
     public CommissionMemberResponseDTO addMemberToCommission(Long commissionId, AddCommissionMemberDTO dto, Long rhId) {
         // Vérifier que la commission existe et appartient au RH
         Commission commission = commissionRepository.findByIdAndCreatedById(commissionId, rhId)
-                .orElseThrow(() -> new RuntimeException("Commission non trouvée ou vous n'avez pas les droits"));
+                .orElseThrow(() -> new UnauthorizedActionException("Commission non trouvée ou vous n'avez pas les droits"));
 
         // Vérifier que l'utilisateur existe
         User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'ID : " + dto.getUserId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur non trouvé avec l'ID : " + dto.getUserId()));
 
         // Vérifier que l'utilisateur n'est pas déjà membre
-        if (commissionMemberRepository.existsByCommissionIdAndUserId(commissionId, dto.getUserId())) {
-            throw new RuntimeException("Cet utilisateur est déjà membre de la commission");
+        if (commissionMemberRepository.existsByCommissionIdAndId(commissionId, dto.getUserId())) {
+            throw new InvalidActionException("Cet utilisateur est déjà membre de la commission");
         }
 
         // Convertir le rôle
@@ -80,21 +83,23 @@ public class CommissionService {
         try {
             role = CommissionRole.valueOf(dto.getRole().toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Rôle invalide. Utilisez 'PRESIDENT' ou 'MEMBER'");
+            throw new InvalidActionException("Rôle invalide. Utilisez 'PRESIDENT' ou 'MEMBER'");
         }
 
         // Si le rôle est PRESIDENT, vérifier qu'il n'y a pas déjà un président
         if (role == CommissionRole.PRESIDENT) {
             if (commissionMemberRepository.hasPresident(commissionId)) {
-                throw new RuntimeException("Cette commission a déjà un président");
+                throw new InvalidActionException("Cette commission a déjà un président");
             }
         }
 
         // Créer le membre
         CommissionMember member = new CommissionMember();
-        member.setCommission(commission);
-        member.setUser(user);
-        member.setRole(role);
+        member.setFirstName(user.getFirstName());
+        member.setLastName(user.getLastName());
+        member.setEmail(user.getEmail());
+        member.setPassword(user.getPassword());
+        member.setRole(user.getRole());
         member.setExpertiseArea(dto.getExpertiseArea());
 
         CommissionMember savedMember = commissionMemberRepository.save(member);
@@ -108,25 +113,34 @@ public class CommissionService {
     public CommissionMemberResponseDTO changePresident(Long commissionId, Long newPresidentMemberId, Long rhId) {
         // Vérifier que la commission existe et appartient au RH
         Commission commission = commissionRepository.findByIdAndCreatedById(commissionId, rhId)
-                .orElseThrow(() -> new RuntimeException("Commission non trouvée ou vous n'avez pas les droits"));
+                .orElseThrow(() -> new UnauthorizedActionException("Commission non trouvée ou vous n'avez pas les droits"));
 
         // Vérifier que le nouveau président est bien un membre de la commission
         CommissionMember newPresident = commissionMemberRepository.findByIdAndCommissionId(newPresidentMemberId, commissionId)
-                .orElseThrow(() -> new RuntimeException("Membre non trouvé dans cette commission"));
+                .orElseThrow(() -> new ResourceNotFoundException("Membre non trouvé dans cette commission"));
 
         // Rétrograder l'ancien président s'il existe
         commissionMemberRepository.findByCommissionIdAndRole(commissionId, CommissionRole.PRESIDENT)
                 .ifPresent(oldPresident -> {
-                    oldPresident.setRole(CommissionRole.MEMBER);
+                    oldPresident.setCommissionRole(CommissionRole.MEMBER);
                     commissionMemberRepository.save(oldPresident);
                 });
 
         // Promouvoir le nouveau président
-        newPresident.setRole(CommissionRole.PRESIDENT);
+        newPresident.setCommissionRole(CommissionRole.PRESIDENT);
         CommissionMember savedPresident = commissionMemberRepository.save(newPresident);
 
-        return mapToMemberResponseDTO(savedPresident);
+        // Mapping sans getUser(), car CommissionMember hérite de User
+        return CommissionMemberResponseDTO.builder()
+                .id(savedPresident.getId())
+                .userId(savedPresident.getId())
+                .userName(savedPresident.getFullName())
+                .userEmail(savedPresident.getEmail())
+                .role(savedPresident.getRole().name())
+                .expertiseArea(savedPresident.getExpertiseArea())
+                .build();
     }
+
 
     /**
      * Retirer un membre de la commission
@@ -135,11 +149,11 @@ public class CommissionService {
     public void removeMemberFromCommission(Long commissionId, Long memberId, Long rhId) {
         // Vérifier que la commission existe et appartient au RH
         Commission commission = commissionRepository.findByIdAndCreatedById(commissionId, rhId)
-                .orElseThrow(() -> new RuntimeException("Commission non trouvée ou vous n'avez pas les droits"));
+                .orElseThrow(() -> new UnauthorizedActionException("Commission non trouvée ou vous n'avez pas les droits"));
 
         // Vérifier que le membre existe
         CommissionMember member = commissionMemberRepository.findByIdAndCommissionId(memberId, commissionId)
-                .orElseThrow(() -> new RuntimeException("Membre non trouvé dans cette commission"));
+                .orElseThrow(() -> new ResourceNotFoundException("Membre non trouvé dans cette commission"));
 
         commissionMemberRepository.delete(member);
     }
@@ -150,7 +164,7 @@ public class CommissionService {
     @Transactional
     public CommissionResponseDTO updateCommission(Long commissionId, UpdateCommissionDTO dto, Long rhId) {
         Commission commission = commissionRepository.findByIdAndCreatedById(commissionId, rhId)
-                .orElseThrow(() -> new RuntimeException("Commission non trouvée ou vous n'avez pas les droits"));
+                .orElseThrow(() -> new UnauthorizedActionException("Commission non trouvée ou vous n'avez pas les droits"));
 
         if (dto.getName() != null) {
             commission.setName(dto.getName());
@@ -172,7 +186,7 @@ public class CommissionService {
     @Transactional
     public void deleteCommission(Long commissionId, Long rhId) {
         Commission commission = commissionRepository.findByIdAndCreatedById(commissionId, rhId)
-                .orElseThrow(() -> new RuntimeException("Commission non trouvée ou vous n'avez pas les droits"));
+                .orElseThrow(() -> new UnauthorizedActionException("Commission non trouvée ou vous n'avez pas les droits"));
 
         commissionRepository.delete(commission);
     }
@@ -201,7 +215,7 @@ public class CommissionService {
     @Transactional(readOnly = true)
     public CommissionResponseDTO getCommissionById(Long commissionId, Long rhId) {
         Commission commission = commissionRepository.findByIdAndCreatedById(commissionId, rhId)
-                .orElseThrow(() -> new RuntimeException("Commission non trouvée ou vous n'avez pas les droits"));
+                .orElseThrow(() -> new UnauthorizedActionException("Commission non trouvée ou vous n'avez pas les droits"));
 
         return mapToResponseDTO(commission);
     }
@@ -213,7 +227,7 @@ public class CommissionService {
     public List<CommissionMemberResponseDTO> getCommissionMembers(Long commissionId, Long rhId) {
         // Vérifier que la commission appartient au RH
         commissionRepository.findByIdAndCreatedById(commissionId, rhId)
-                .orElseThrow(() -> new RuntimeException("Commission non trouvée ou vous n'avez pas les droits"));
+                .orElseThrow(() -> new UnauthorizedActionException("Commission non trouvée ou vous n'avez pas les droits"));
 
         List<CommissionMember> members = commissionMemberRepository.findByCommissionId(commissionId);
 
@@ -229,7 +243,7 @@ public class CommissionService {
                 .collect(Collectors.toList());
 
         CommissionMemberResponseDTO president = commission.getMembers().stream()
-                .filter(m -> m.getRole() == CommissionRole.PRESIDENT)
+                .filter(m -> m.getCommissionRole() == CommissionRole.PRESIDENT)
                 .findFirst()
                 .map(this::mapToMemberResponseDTO)
                 .orElse(null);
@@ -253,11 +267,10 @@ public class CommissionService {
 
     private CommissionListDTO mapToListDTO(Commission commission) {
         String presidentName = commission.getMembers().stream()
-                .filter(m -> m.getRole() == CommissionRole.PRESIDENT)
+                .filter(m -> m.getCommissionRole() == CommissionRole.PRESIDENT)
                 .findFirst()
-                .map(m -> m.getUser().getFullName())
+                .map(CommissionMember::getFullName)
                 .orElse(null);
-
         return CommissionListDTO.builder()
                 .id(commission.getId())
                 .name(commission.getName())
@@ -273,9 +286,9 @@ public class CommissionService {
     private CommissionMemberResponseDTO mapToMemberResponseDTO(CommissionMember member) {
         return CommissionMemberResponseDTO.builder()
                 .id(member.getId())
-                .userId(member.getUser().getId())
-                .userName(member.getUser().getFullName())
-                .userEmail(member.getUser().getEmail())
+                .userId(member.getId())
+                .userName(member.getFullName())
+                .userEmail(member.getEmail())
                 .role(member.getRole().name())
                 .expertiseArea(member.getExpertiseArea())
                 .build();

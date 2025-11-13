@@ -1,11 +1,9 @@
 package com.ept.sn.cri.backend.auth.controller;
 
 
-import com.ept.sn.cri.backend.auth.dto.AuthResponse;
-import com.ept.sn.cri.backend.auth.dto.LoginRequest;
-import com.ept.sn.cri.backend.auth.dto.RegistrationRequest;
-import com.ept.sn.cri.backend.auth.dto.RhRequest;
+import com.ept.sn.cri.backend.auth.dto.*;
 import com.ept.sn.cri.backend.auth.service.AuthenticationService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-@Tag(name="Authentication")
+@Tag(name="Authentification")
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
@@ -36,6 +34,15 @@ public class AuthenticationController {
             @RequestBody @Valid RhRequest request
     ){
         authenticationService.registerRh(request);
+        return ResponseEntity.accepted().build();
+    }
+
+    @PostMapping("/register/commission-member")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public ResponseEntity<?> registerCommissionMember(
+            @RequestBody @Valid CommissionMemberRequest request
+    ){
+        authenticationService.registerCommissionMember(request);
         return ResponseEntity.accepted().build();
     }
 

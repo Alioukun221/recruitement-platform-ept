@@ -8,10 +8,12 @@ import com.ept.sn.cri.backend.rh.dto.JobOfferListDTO;
 import com.ept.sn.cri.backend.rh.dto.JobOfferResponseDTO;
 import com.ept.sn.cri.backend.rh.dto.UpdateJobOfferDTO;
 import com.ept.sn.cri.backend.rh.service.JobOfferService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/rh")
 @RequiredArgsConstructor
+@Tag(name="Gestion des offres")
 public class JobOfferController {
 
     private final JobOfferService jobOfferService;
@@ -27,6 +30,7 @@ public class JobOfferController {
     /**
      * Créer une nouvelle offre d'emploi
      */
+    @PreAuthorize("hasAuthority('RH')")
     @PostMapping("/create-job-offers")
     public ResponseEntity<JobOfferResponseDTO> createJobOffer(
             @Valid @RequestBody CreateJobOfferDTO dto,
@@ -39,6 +43,7 @@ public class JobOfferController {
     /**
      * Modifier une offre d'emploi existante
      */
+    @PreAuthorize("hasAuthority('RH')")
     @PutMapping("/update-job-offers/{id}")
     public ResponseEntity<JobOfferResponseDTO> updateJobOffer(
             @PathVariable Long id,
@@ -52,6 +57,7 @@ public class JobOfferController {
     /**
      * Supprimer une offre d'emploi
      */
+    @PreAuthorize("hasAuthority('RH')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteJobOffer(
             @PathVariable Long id,
@@ -66,6 +72,7 @@ public class JobOfferController {
      * Avec filtre optionnel par statut et tri par date de création (DESC)
      * GET /api/v1/rh/job-offers?status=PUBLISHED
      */
+    @PreAuthorize("hasAuthority('RH')")
     @GetMapping("/job-offers")
     public ResponseEntity<List<JobOfferListDTO>> getAllJobOffers(
             @RequestParam(required = false) JobStatus status,
@@ -78,6 +85,7 @@ public class JobOfferController {
     /**
      * Obtenir les détails d'une offre spécifique
      */
+    @PreAuthorize("hasAuthority('RH')")
     @GetMapping("job-offers/{id}")
     public ResponseEntity<JobOfferResponseDTO> getJobOfferById(
             @PathVariable Long id,

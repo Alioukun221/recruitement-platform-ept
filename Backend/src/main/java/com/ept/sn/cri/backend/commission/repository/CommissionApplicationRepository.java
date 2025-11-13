@@ -28,14 +28,13 @@ public interface CommissionApplicationRepository extends JpaRepository<Applicati
             @Param("applicationId") Long applicationId,
             @Param("commissionId") Long commissionId);
 
-    // Vérifier qu'un membre de commission a accès à une candidature
     @Query("SELECT CASE WHEN COUNT(cm) > 0 THEN true ELSE false END " +
             "FROM CommissionMember cm " +
-            "WHERE cm.user.id = :userId " +
+            "WHERE cm.id = :userId " +
             "AND cm.commission.jobOffer.id = (SELECT a.jobOffer.id FROM Application a WHERE a.id = :applicationId)")
     boolean canMemberAccessApplication(@Param("userId") Long userId, @Param("applicationId") Long applicationId);
 
-    // Trouver les commissions dont un utilisateur est membre
-    @Query("SELECT cm.commission.id FROM CommissionMember cm WHERE cm.user.id = :userId")
+    @Query("SELECT cm.commission.id FROM CommissionMember cm WHERE cm.id = :userId")
     List<Long> findCommissionIdsByUserId(@Param("userId") Long userId);
+
 }

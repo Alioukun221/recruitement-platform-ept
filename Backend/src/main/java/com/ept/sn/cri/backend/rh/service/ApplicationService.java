@@ -3,6 +3,9 @@ package com.ept.sn.cri.backend.rh.service;
 import com.ept.sn.cri.backend.entity.Application;
 import com.ept.sn.cri.backend.entity.JobOffer;
 import com.ept.sn.cri.backend.enums.ApplicationStatus;
+import com.ept.sn.cri.backend.exception.ApplicationNotBelongToOfferException;
+import com.ept.sn.cri.backend.exception.ResourceNotFoundException;
+import com.ept.sn.cri.backend.exception.UnauthorizedActionException;
 import com.ept.sn.cri.backend.rh.dto.*;
 import com.ept.sn.cri.backend.rh.repository.ApplicationRepository;
 import com.ept.sn.cri.backend.rh.repository.JobOfferRepository;
@@ -29,7 +32,7 @@ public class ApplicationService {
     public List<ApplicationListDTO> getApplicationsByJobOffer(Long jobOfferId, Long rhId, ApplicationStatus status) {
         // Vérifier que l'offre appartient au RH
         jobOfferRepository.findByIdAndCreatedById(jobOfferId, rhId)
-                .orElseThrow(() -> new RuntimeException("Offre d'emploi non trouvée ou vous n'avez pas les droits"));
+                .orElseThrow(() -> new UnauthorizedActionException("Offre d'emploi non trouvée ou vous n'avez pas les droits"));
 
         List<Application> applications;
 
@@ -50,7 +53,7 @@ public class ApplicationService {
     @Transactional(readOnly = true)
     public ApplicationDetailDTO getApplicationDetails(Long applicationId, Long rhId) {
         Application application = applicationRepository.findByIdAndRhId(applicationId, rhId)
-                .orElseThrow(() -> new RuntimeException("Candidature non trouvée ou vous n'avez pas les droits"));
+                .orElseThrow(() -> new UnauthorizedActionException("Candidature non trouvée ou vous n'avez pas les droits"));
 
         return mapToDetailDTO(application);
     }
@@ -62,17 +65,17 @@ public class ApplicationService {
     public List<ApplicationDetailDTO> shortlistApplications(Long jobOfferId, ShortlistApplicationsDTO dto, Long rhId) {
         // Vérifier que l'offre appartient au RH
         jobOfferRepository.findByIdAndCreatedById(jobOfferId, rhId)
-                .orElseThrow(() -> new RuntimeException("Offre d'emploi non trouvée ou vous n'avez pas les droits"));
+                .orElseThrow(() -> new UnauthorizedActionException("Offre d'emploi non trouvée ou vous n'avez pas les droits"));
 
         List<ApplicationDetailDTO> shortlisted = new ArrayList<>();
 
         for (Long applicationId : dto.getApplicationIds()) {
             Application application = applicationRepository.findByIdAndRhId(applicationId, rhId)
-                    .orElseThrow(() -> new RuntimeException("Candidature avec ID " + applicationId + " non trouvée"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Candidature avec ID " + applicationId + " non trouvée"));
 
             // Vérifier que la candidature appartient bien à cette offre
             if (!application.getJobOffer().getId().equals(jobOfferId)) {
-                throw new RuntimeException("La candidature " + applicationId + " n'appartient pas à cette offre");
+                throw new ApplicationNotBelongToOfferException("La candidature " + applicationId + " n'appartient pas à cette offre");
             }
 
             // Changer le statut en SHORTLISTED
@@ -90,7 +93,7 @@ public class ApplicationService {
     @Transactional
     public ApplicationDetailDTO updateApplicationStatus(Long applicationId, UpdateApplicationStatusDTO dto, Long rhId) {
         Application application = applicationRepository.findByIdAndRhId(applicationId, rhId)
-                .orElseThrow(() -> new RuntimeException("Candidature non trouvée ou vous n'avez pas les droits"));
+                .orElseThrow(() -> new UnauthorizedActionException("Candidature non trouvée ou vous n'avez pas les droits"));
 
         application.setApplicationStatus(dto.getStatus());
 
@@ -105,7 +108,7 @@ public class ApplicationService {
     public List<ApplicationDetailDTO> getShortlistedApplications(Long jobOfferId, Long rhId) {
         // Vérifier que l'offre appartient au RH
         jobOfferRepository.findByIdAndCreatedById(jobOfferId, rhId)
-                .orElseThrow(() -> new RuntimeException("Offre d'emploi non trouvée ou vous n'avez pas les droits"));
+                .orElseThrow(() -> new UnauthorizedActionException("Offre d'emploi non trouvée ou vous n'avez pas les droits"));
 
         List<Application> applications = applicationRepository.findShortlistedByJobOfferId(jobOfferId, rhId);
 
@@ -121,7 +124,7 @@ public class ApplicationService {
     public ApplicationStatsDTO getApplicationStats(Long jobOfferId, Long rhId) {
         // Vérifier que l'offre appartient au RH
         JobOffer jobOffer = jobOfferRepository.findByIdAndCreatedById(jobOfferId, rhId)
-                .orElseThrow(() -> new RuntimeException("Offre d'emploi non trouvée ou vous n'avez pas les droits"));
+                .orElseThrow(() -> new UnauthorizedActionException("Offre d'emploi non trouvée ou vous n'avez pas les droits"));
 
         Object[] stats = applicationRepository.getApplicationStatsByJobOfferId(jobOfferId, rhId);
 
@@ -156,7 +159,7 @@ public class ApplicationService {
     @Transactional
     public ApplicationDetailDTO rejectApplication(Long applicationId, Long rhId) {
         Application application = applicationRepository.findByIdAndRhId(applicationId, rhId)
-                .orElseThrow(() -> new RuntimeException("Candidature non trouvée ou vous n'avez pas les droits"));
+                .orElseThrow(() -> new UnauthorizedActionException("Candidature non trouvée ou vous n'avez pas les droits"));
 
         application.setApplicationStatus(ApplicationStatus.REJECTED);
         Application updated = applicationRepository.save(application);
@@ -171,16 +174,16 @@ public class ApplicationService {
     public List<ApplicationDetailDTO> rejectMultipleApplications(Long jobOfferId, ShortlistApplicationsDTO dto, Long rhId) {
         // Vérifier que l'offre appartient au RH
         jobOfferRepository.findByIdAndCreatedById(jobOfferId, rhId)
-                .orElseThrow(() -> new RuntimeException("Offre d'emploi non trouvée ou vous n'avez pas les droits"));
+                .orElseThrow(() -> new UnauthorizedActionException("Offre d'emploi non trouvée ou vous n'avez pas les droits"));
 
         List<ApplicationDetailDTO> rejected = new ArrayList<>();
 
         for (Long applicationId : dto.getApplicationIds()) {
             Application application = applicationRepository.findByIdAndRhId(applicationId, rhId)
-                    .orElseThrow(() -> new RuntimeException("Candidature avec ID " + applicationId + " non trouvée"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Candidature avec ID " + applicationId + " non trouvée"));
 
             if (!application.getJobOffer().getId().equals(jobOfferId)) {
-                throw new RuntimeException("La candidature " + applicationId + " n'appartient pas à cette offre");
+                throw new ApplicationNotBelongToOfferException("La candidature " + applicationId + " n'appartient pas à cette offre");
             }
 
             application.setApplicationStatus(ApplicationStatus.REJECTED);
@@ -198,7 +201,7 @@ public class ApplicationService {
     public List<ApplicationListDTO> getApplicationsByMinScore(Long jobOfferId, Long minScore, Long rhId) {
         // Vérifier que l'offre appartient au RH
         jobOfferRepository.findByIdAndCreatedById(jobOfferId, rhId)
-                .orElseThrow(() -> new RuntimeException("Offre d'emploi non trouvée ou vous n'avez pas les droits"));
+                .orElseThrow(() -> new UnauthorizedActionException("Offre d'emploi non trouvée ou vous n'avez pas les droits"));
 
         List<Application> applications = applicationRepository.findByJobOfferIdAndMinScore(jobOfferId, minScore, Math.toIntExact(rhId));
 

@@ -6,9 +6,13 @@ import com.ept.sn.cri.backend.commission.repository.EvaluationRepository;
 import com.ept.sn.cri.backend.entity.Application;
 import com.ept.sn.cri.backend.entity.CommissionMember;
 import com.ept.sn.cri.backend.entity.Evaluation;
+import com.ept.sn.cri.backend.exception.EvaluationNotFoundException;
+import com.ept.sn.cri.backend.exception.ResourceNotFoundException;
+import com.ept.sn.cri.backend.exception.UnauthorizedActionException;
 import com.ept.sn.cri.backend.rh.repository.CommissionMemberRepository;
 import com.ept.sn.cri.backend.rh.repository.CommissionRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.ResourceClosedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,14 +64,14 @@ public class CommissionMemberService {
     public List<CommissionApplicationListDTO> getShortlistedApplications(Long commissionId, Long userId) {
         // Vérifier que l'utilisateur est membre de cette commission
         if (!isMemberOfCommission(userId, commissionId)) {
-            throw new RuntimeException("Vous n'êtes pas membre de cette commission");
+            throw new UnauthorizedActionException("Vous n'êtes pas membre de cette commission");
         }
 
         List<Application> applications = commissionApplicationRepository
                 .findShortlistedApplicationsByCommissionId(commissionId);
 
         CommissionMember member = commissionMemberRepository.findByUserIdAndCommissionId(userId, commissionId)
-                .orElseThrow(() -> new RuntimeException("Membre de commission non trouvé"));
+                .orElseThrow(() -> new ResourceNotFoundException("Membre de commission non trouvé"));
 
         return applications.stream()
                 .map(app -> mapToListDTO(app, member.getId()))
@@ -81,16 +85,16 @@ public class CommissionMemberService {
     public CommissionApplicationDetailDTO getApplicationDetails(Long applicationId, Long commissionId, Long userId) {
         // Vérifier que l'utilisateur est membre de cette commission
         if (!isMemberOfCommission(userId, commissionId)) {
-            throw new RuntimeException("Vous n'êtes pas membre de cette commission");
+            throw new UnauthorizedActionException("Vous n'êtes pas membre de cette commission");
         }
 
         // Vérifier que la candidature appartient à cette commission et est présélectionnée
         Application application = commissionApplicationRepository
                 .findShortlistedApplicationByIdAndCommissionId(applicationId, commissionId)
-                .orElseThrow(() -> new RuntimeException("Candidature non trouvée ou non accessible"));
+                .orElseThrow(() -> new ResourceNotFoundException("Candidature non trouvée ou non accessible"));
 
         CommissionMember member = commissionMemberRepository.findByUserIdAndCommissionId(userId, commissionId)
-                .orElseThrow(() -> new RuntimeException("Membre de commission non trouvé"));
+                .orElseThrow(() -> new ResourceNotFoundException("Membre de commission non trouvé"));
 
         return mapToDetailDTO(application, member.getId());
     }
@@ -102,16 +106,16 @@ public class CommissionMemberService {
     public EvaluationResponseDTO evaluateApplication(Long applicationId, Long commissionId, CreateEvaluationDTO dto, Long userId) {
         // Vérifier que l'utilisateur est membre de cette commission
         if (!isMemberOfCommission(userId, commissionId)) {
-            throw new RuntimeException("Vous n'êtes pas membre de cette commission");
+            throw new UnauthorizedActionException("Vous n'êtes pas membre de cette commission");
         }
 
         // Vérifier que la candidature appartient à cette commission et est présélectionnée
         Application application = commissionApplicationRepository
                 .findShortlistedApplicationByIdAndCommissionId(applicationId, commissionId)
-                .orElseThrow(() -> new RuntimeException("Candidature non trouvée ou non accessible"));
+                .orElseThrow(() -> new ResourceNotFoundException("Candidature non trouvée ou non accessible"));
 
         CommissionMember member = commissionMemberRepository.findByUserIdAndCommissionId(userId, commissionId)
-                .orElseThrow(() -> new RuntimeException("Membre de commission non trouvé"));
+                .orElseThrow(() -> new ResourceNotFoundException("Membre de commission non trouvé"));
 
         // Vérifier si le membre a déjà évalué cette candidature
         boolean alreadyEvaluated = evaluationRepository.existsByCommissionMemberIdAndApplicationId(member.getId(), applicationId);
@@ -120,7 +124,7 @@ public class CommissionMemberService {
         if (alreadyEvaluated) {
             // Mettre à jour l'évaluation existante
             evaluation = evaluationRepository.findByCommissionMemberIdAndApplicationId(member.getId(), applicationId)
-                    .orElseThrow(() -> new RuntimeException("Évaluation non trouvée"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Évaluation non trouvée"));
             evaluation.setUpdatedAt(LocalDateTime.now());
         } else {
             // Créer une nouvelle évaluation
@@ -148,14 +152,14 @@ public class CommissionMemberService {
     @Transactional(readOnly = true)
     public EvaluationResponseDTO getMyEvaluation(Long applicationId, Long commissionId, Long userId) {
         if (!isMemberOfCommission(userId, commissionId)) {
-            throw new RuntimeException("Vous n'êtes pas membre de cette commission");
+            throw new UnauthorizedActionException("Vous n'êtes pas membre de cette commission");
         }
 
         CommissionMember member = commissionMemberRepository.findByUserIdAndCommissionId(userId, commissionId)
-                .orElseThrow(() -> new RuntimeException("Membre de commission non trouvé"));
+                .orElseThrow(() -> new ResourceNotFoundException("Membre de commission non trouvé"));
 
         Evaluation evaluation = evaluationRepository.findByCommissionMemberIdAndApplicationId(member.getId(), applicationId)
-                .orElseThrow(() -> new RuntimeException("Vous n'avez pas encore évalué ce candidat"));
+                .orElseThrow(() -> new EvaluationNotFoundException("Vous n'avez pas encore évalué ce candidat"));
 
         return mapToEvaluationResponseDTO(evaluation);
     }
@@ -166,14 +170,14 @@ public class CommissionMemberService {
     @Transactional
     public void deleteMyEvaluation(Long applicationId, Long commissionId, Long userId) {
         if (!isMemberOfCommission(userId, commissionId)) {
-            throw new RuntimeException("Vous n'êtes pas membre de cette commission");
+            throw new UnauthorizedActionException("Vous n'êtes pas membre de cette commission");
         }
 
         CommissionMember member = commissionMemberRepository.findByUserIdAndCommissionId(userId, commissionId)
-                .orElseThrow(() -> new RuntimeException("Membre de commission non trouvé"));
+                .orElseThrow(() -> new ResourceNotFoundException("Membre de commission non trouvé"));
 
         Evaluation evaluation = evaluationRepository.findByCommissionMemberIdAndApplicationId(member.getId(), applicationId)
-                .orElseThrow(() -> new RuntimeException("Vous n'avez pas encore évalué ce candidat"));
+                .orElseThrow(() -> new EvaluationNotFoundException("Vous n'avez pas encore évalué ce candidat"));
 
         evaluationRepository.delete(evaluation);
     }
@@ -259,8 +263,8 @@ public class CommissionMemberService {
 
         return EvaluationResponseDTO.builder()
                 .id(evaluation.getId())
-                .evaluatorId(evaluation.getCommissionMember().getUser().getId())
-                .evaluatorName(evaluation.getCommissionMember().getUser().getFullName())
+                .evaluatorId(evaluation.getCommissionMember().getId())
+                .evaluatorName(evaluation.getCommissionMember().getFullName())
                 .evaluatorRole(evaluation.getCommissionMember().getRole().name())
                 .competenceScore(evaluation.getCompetenceScore())
                 .experienceScore(evaluation.getExperienceScore())

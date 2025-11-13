@@ -11,6 +11,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -69,8 +70,7 @@ public class JobOffer {
     private Date lastModifiedDate;
 
     @Future(message = "La date limite doit être dans le futur.")
-    @Temporal(TemporalType.DATE)
-    private Date dateLimite;
+    private LocalDateTime dateLimite;
 
 
     @OneToMany(mappedBy = "jobOffer", cascade = CascadeType.ALL, orphanRemoval = true)

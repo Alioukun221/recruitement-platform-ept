@@ -5,10 +5,12 @@ import com.ept.sn.cri.backend.entity.RH;
 import com.ept.sn.cri.backend.enums.CommissionStatus;
 import com.ept.sn.cri.backend.rh.dto.*;
 import com.ept.sn.cri.backend.rh.service.CommissionService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/rh/commissions")
 @RequiredArgsConstructor
+@Tag(name="Gestion des commissions de recrutement")
 public class CommissionController {
 
     private final CommissionService commissionService;
@@ -24,6 +27,7 @@ public class CommissionController {
     /**
      * Créer une nouvelle commission de recrutement
      */
+    @PreAuthorize("hasAuthority('RH')")
     @PostMapping()
     public ResponseEntity<CommissionResponseDTO> createCommission(
             @Valid @RequestBody CreateCommissionDTO dto,
@@ -36,6 +40,7 @@ public class CommissionController {
     /**
      * Ajouter un membre à une commission
      */
+    @PreAuthorize("hasAuthority('RH')")
     @PostMapping("/{commissionId}/members")
     public ResponseEntity<CommissionMemberResponseDTO> addMember(
             @PathVariable Long commissionId,
@@ -49,6 +54,7 @@ public class CommissionController {
     /**
      * Changer le président de la commission
      */
+    @PreAuthorize("hasAuthority('RH')")
     @PutMapping("/{commissionId}/president/{memberId}")
     public ResponseEntity<CommissionMemberResponseDTO> changePresident(
             @PathVariable Long commissionId,
@@ -63,6 +69,7 @@ public class CommissionController {
     /**
      * Retirer un membre d'une commission
      */
+    @PreAuthorize("hasAuthority('RH')")
     @DeleteMapping("/{commissionId}/members/{memberId}")
     public ResponseEntity<Void> removeMember(
             @PathVariable Long commissionId,
@@ -76,6 +83,7 @@ public class CommissionController {
     /**
      * Modifier une commission
      */
+    @PreAuthorize("hasAuthority('RH')")
     @PutMapping("/{commissionId}")
     public ResponseEntity<CommissionResponseDTO> updateCommission(
             @PathVariable Long commissionId,
@@ -89,6 +97,7 @@ public class CommissionController {
     /**
      * Supprimer une commission
      */
+    @PreAuthorize("hasAuthority('RH')")
     @DeleteMapping("/{commissionId}")
     public ResponseEntity<Void> deleteCommission(
             @PathVariable Long commissionId,
@@ -101,6 +110,7 @@ public class CommissionController {
     /**
      * Obtenir toutes les commissions du RH connecté
      */
+    @PreAuthorize("hasAuthority('RH')")
     @GetMapping
     public ResponseEntity<List<CommissionListDTO>> getAllCommissions(
             @RequestParam(required = false) CommissionStatus status,
@@ -113,6 +123,7 @@ public class CommissionController {
     /**
      * Obtenir les détails d'une commission spécifique
      */
+    @PreAuthorize("hasAuthority('RH')")
     @GetMapping("/{commissionId}")
     public ResponseEntity<CommissionResponseDTO> getCommissionById(
             @PathVariable Long commissionId,
@@ -125,6 +136,7 @@ public class CommissionController {
     /**
      * Obtenir tous les membres d'une commission
      */
+    @PreAuthorize("hasAuthority('RH')")
     @GetMapping("/{commissionId}/members")
     public ResponseEntity<List<CommissionMemberResponseDTO>> getCommissionMembers(
             @PathVariable Long commissionId,

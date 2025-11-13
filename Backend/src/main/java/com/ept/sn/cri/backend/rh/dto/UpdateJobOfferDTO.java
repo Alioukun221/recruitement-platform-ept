@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -28,5 +29,5 @@ public class UpdateJobOfferDTO {
     private Integer experienceMin;
 
     @Future(message = "La date limite doit être dans le futur.")
-    private Date dateLimite;
+    private LocalDateTime dateLimite;
 }

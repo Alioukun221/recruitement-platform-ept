@@ -40,7 +40,7 @@ public interface EvaluationRepository extends JpaRepository<Evaluation, Long> {
             "FROM Evaluation e WHERE e.application.id = :applicationId")
     Object[] getAverageScoresByApplicationId(@Param("applicationId") Long applicationId);
 
-    // Trouver les évaluations d'une candidature avec les infos du membre
-    @Query("SELECT e FROM Evaluation e JOIN FETCH e.commissionMember cm JOIN FETCH cm.user WHERE e.application.id = :applicationId")
+    @Query("SELECT e FROM Evaluation e JOIN FETCH e.commissionMember cm " +
+            "WHERE e.application.id = :applicationId")
     List<Evaluation> findByApplicationIdWithMembers(@Param("applicationId") Long applicationId);
 }

@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -27,7 +29,7 @@ public class JobOfferResponseDTO {
     private Integer experienceMin;
     private Date datePublication;
     private Date lastModifiedDate;
-    private Date dateLimite;
+    private LocalDateTime dateLimite;
     private Long createdById;
     private String createdByName;
     private Integer applicationCount;

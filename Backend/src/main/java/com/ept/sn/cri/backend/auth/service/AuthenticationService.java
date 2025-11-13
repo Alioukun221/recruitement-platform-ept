@@ -2,16 +2,15 @@ package com.ept.sn.cri.backend.auth.service;
 
 
 
-import com.ept.sn.cri.backend.auth.dto.RegistrationRequest;
-import com.ept.sn.cri.backend.auth.dto.AuthResponse;
-import com.ept.sn.cri.backend.auth.dto.LoginRequest;
-import com.ept.sn.cri.backend.auth.dto.RhRequest;
+import com.ept.sn.cri.backend.auth.dto.*;
 import com.ept.sn.cri.backend.entity.Candidate;
+import com.ept.sn.cri.backend.entity.CommissionMember;
 import com.ept.sn.cri.backend.entity.RH;
 import com.ept.sn.cri.backend.entity.User;
 import com.ept.sn.cri.backend.enums.Role;
 import com.ept.sn.cri.backend.auth.repository.UserRepository;
 import com.ept.sn.cri.backend.auth.security.JwtService;
+import com.ept.sn.cri.backend.exception.EmailAlreadyExistsException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,6 +30,10 @@ public class AuthenticationService {
     private final JwtService jwtService;
 
     public void register(RegistrationRequest request) {
+
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new EmailAlreadyExistsException("Un utilisateur avec cet email existe déjà");
+        }
         var candidate =  new Candidate();
         candidate.setFirstName(request.getFirstName());
         candidate.setLastName(request.getLastName());
@@ -44,6 +47,10 @@ public class AuthenticationService {
     }
 
     public void registerRh(RhRequest rhRequest) {
+
+        if (userRepository.existsByEmail(rhRequest.getEmail())) {
+            throw new EmailAlreadyExistsException("Un utilisateur avec cet email existe déjà");
+        }
         var rh = new RH();
         rh.setFirstName(rhRequest.getFirstName());
         rh.setLastName(rhRequest.getLastName());
@@ -68,8 +75,28 @@ public class AuthenticationService {
         var claims = new HashMap<String,Object>();
         var user = ((User)auth.getPrincipal());
         claims.put("fullname", user.getFullName());
+        claims.put("role", user.getRole().name());
         var jwtToken = jwtService.generateToken(claims,user);
         return AuthResponse.builder()
                 .token(jwtToken).build();
+    }
+
+    public void registerCommissionMember(@Valid CommissionMemberRequest request) {
+
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new EmailAlreadyExistsException("Un utilisateur avec cet email existe déjà");
+        }
+        CommissionMember member = new CommissionMember();
+        member.setFirstName(request.getFirstName());
+        member.setLastName(request.getLastName());
+        member.setEmail(request.getEmail());
+        member.setPassword(passwordEncoder.encode(request.getPassword()));
+        member.setPhoneNumber(request.getPhoneNumber());
+        member.setExpertiseArea(request.getExpertiseArea());
+        member.setRole(Role.COMMISSION_MEMBER);
+
+        userRepository.save(member);
+
+
     }
 }

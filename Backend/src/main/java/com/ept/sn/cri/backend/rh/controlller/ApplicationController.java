@@ -4,9 +4,11 @@ import com.ept.sn.cri.backend.entity.RH;
 import com.ept.sn.cri.backend.enums.ApplicationStatus;
 import com.ept.sn.cri.backend.rh.dto.*;
 import com.ept.sn.cri.backend.rh.service.ApplicationService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/rh/applications")
 @RequiredArgsConstructor
+@Tag(name="Gestion des candidatures")
 public class ApplicationController {
 
     private final ApplicationService applicationService;
@@ -22,6 +25,7 @@ public class ApplicationController {
     /**
      * Obtenir toutes les candidatures pour une offre d'emploi
      */
+    @PreAuthorize("hasAuthority('RH')")
     @GetMapping("/job-offer/{jobOfferId}")
     public ResponseEntity<List<ApplicationListDTO>> getApplicationsByJobOffer(
             @PathVariable Long jobOfferId,
@@ -36,6 +40,7 @@ public class ApplicationController {
     /**
      * Obtenir les détails complets d'une candidature
      */
+    @PreAuthorize("hasAuthority('RH')")
     @GetMapping("/{applicationId}")
     public ResponseEntity<ApplicationDetailDTO> getApplicationDetails(
             @PathVariable Long applicationId,
@@ -48,6 +53,7 @@ public class ApplicationController {
     /**
      * Présélectionner des candidats pour l'entretien
      */
+    @PreAuthorize("hasAuthority('RH')")
     @PostMapping("/job-offer/{jobOfferId}/shortlist")
     public ResponseEntity<List<ApplicationDetailDTO>> shortlistApplications(
             @PathVariable Long jobOfferId,
@@ -61,6 +67,7 @@ public class ApplicationController {
     /**
      * Obtenir les candidats présélectionnés pour une offre
      */
+    @PreAuthorize("hasAuthority('RH')")
     @GetMapping("/job-offer/{jobOfferId}/shortlisted")
     public ResponseEntity<List<ApplicationDetailDTO>> getShortlistedApplications(
             @PathVariable Long jobOfferId,
@@ -74,6 +81,7 @@ public class ApplicationController {
     /**
      * Changer le statut d'une candidature
      */
+    @PreAuthorize("hasAuthority('RH')")
     @PutMapping("/{applicationId}/status")
     public ResponseEntity<ApplicationDetailDTO> updateApplicationStatus(
             @PathVariable Long applicationId,
@@ -87,6 +95,7 @@ public class ApplicationController {
     /**
      * Rejeter une candidature
      */
+    @PreAuthorize("hasAuthority('RH')")
     @PutMapping("/{applicationId}/reject")
     public ResponseEntity<ApplicationDetailDTO> rejectApplication(
             @PathVariable Long applicationId,
@@ -99,6 +108,7 @@ public class ApplicationController {
     /**
      * Rejeter plusieurs candidatures en masse
      */
+    @PreAuthorize("hasAuthority('RH')")
     @PostMapping("/job-offer/{jobOfferId}/reject-multiple")
     public ResponseEntity<List<ApplicationDetailDTO>> rejectMultipleApplications(
             @PathVariable Long jobOfferId,
@@ -112,6 +122,7 @@ public class ApplicationController {
     /**
      * Obtenir les statistiques des candidatures pour une offre
      */
+    @PreAuthorize("hasAuthority('RH')")
     @GetMapping("/job-offer/{jobOfferId}/stats")
     public ResponseEntity<ApplicationStatsDTO> getApplicationStats(
             @PathVariable Long jobOfferId,
@@ -124,6 +135,7 @@ public class ApplicationController {
     /**
      * Obtenir les candidatures avec un score minimum
      */
+    @PreAuthorize("hasAuthority('RH')")
     @GetMapping("/job-offer/{jobOfferId}/by-score")
     public ResponseEntity<List<ApplicationListDTO>> getApplicationsByMinScore(
             @PathVariable Long jobOfferId,

@@ -4,6 +4,8 @@ package com.ept.sn.cri.backend.rh.service;
 import com.ept.sn.cri.backend.entity.JobOffer;
 import com.ept.sn.cri.backend.entity.RH;
 import com.ept.sn.cri.backend.enums.JobStatus;
+import com.ept.sn.cri.backend.exception.ResourceNotFoundException;
+import com.ept.sn.cri.backend.exception.UnauthorizedActionException;
 import com.ept.sn.cri.backend.rh.dto.CreateJobOfferDTO;
 import com.ept.sn.cri.backend.rh.dto.JobOfferListDTO;
 import com.ept.sn.cri.backend.rh.dto.JobOfferResponseDTO;
@@ -30,7 +32,7 @@ public class JobOfferService {
     @Transactional
     public JobOfferResponseDTO createJobOffer(CreateJobOfferDTO dto, Long rhId) {
         RH rh = rhRepository.findById(rhId)
-                .orElseThrow(() -> new RuntimeException("RH non trouvé avec l'ID : " + rhId));
+                .orElseThrow(() -> new ResourceNotFoundException("RH non trouvé avec l'ID : " + rhId));
 
         JobOffer jobOffer = new JobOffer();
         jobOffer.setJobTitle(dto.getJobTitle());
@@ -54,7 +56,7 @@ public class JobOfferService {
     @Transactional
     public JobOfferResponseDTO updateJobOffer(Long offerId, UpdateJobOfferDTO dto, Long rhId) {
         JobOffer jobOffer = jobOfferRepository.findByIdAndCreatedById(offerId, rhId)
-                .orElseThrow(() -> new RuntimeException("Offre non trouvée ou vous n'avez pas les droits pour la modifier"));
+                .orElseThrow(() -> new UnauthorizedActionException("Offre non trouvée ou vous n'avez pas les droits pour la modifier"));
 
         if (dto.getJobTitle() != null) {
             jobOffer.setJobTitle(dto.getJobTitle());
@@ -94,7 +96,7 @@ public class JobOfferService {
     @Transactional
     public void deleteJobOffer(Long offerId, Long rhId) {
         JobOffer jobOffer = jobOfferRepository.findByIdAndCreatedById(offerId, rhId)
-                .orElseThrow(() -> new RuntimeException("Offre non trouvée ou vous n'avez pas les droits pour la supprimer"));
+                .orElseThrow(() -> new UnauthorizedActionException("Offre non trouvée ou vous n'avez pas les droits pour la supprimer"));
 
         jobOfferRepository.delete(jobOffer);
     }

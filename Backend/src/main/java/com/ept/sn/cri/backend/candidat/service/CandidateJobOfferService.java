@@ -8,6 +8,7 @@ import com.ept.sn.cri.backend.entity.Application;
 import com.ept.sn.cri.backend.entity.Candidate;
 import com.ept.sn.cri.backend.entity.JobOffer;
 import com.ept.sn.cri.backend.enums.ApplicationStatus;
+import com.ept.sn.cri.backend.exception.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -56,7 +58,7 @@ public class CandidateJobOfferService {
         JobOffer jobOffer = publicJobOfferRepository.findPublishedJobOfferById(jobOfferId);
 
         if (jobOffer == null) {
-            throw new RuntimeException("Offre d'emploi non trouvée ou non disponible");
+            throw new ResourceNotFoundException("Offre d'emploi non trouvée ou non disponible");
         }
 
         return mapToPublicDetailDTO(jobOffer);
@@ -87,22 +89,24 @@ public class CandidateJobOfferService {
 
         // Vérifier que le candidat existe
         Candidate candidate = candidateRepository.findById(candidateId)
-                .orElseThrow(() -> new RuntimeException("Candidat non trouvé"));
+                .orElseThrow(() -> new ResourceNotFoundException("Candidat non trouvé"));
 
         // Vérifier que l'offre existe et est disponible
         JobOffer jobOffer = publicJobOfferRepository.findPublishedJobOfferById(jobOfferId);
         if (jobOffer == null) {
-            throw new RuntimeException("Offre d'emploi non trouvée ou non disponible");
+            throw new ResourceNotFoundException("Offre d'emploi non trouvée ou non disponible");
         }
-
-        // Vérifier la date limite
-        if (jobOffer.getDateLimite() != null && jobOffer.getDateLimite().before(new Date())) {
-            throw new RuntimeException("La date limite pour cette offre est expirée");
+        if (jobOffer.getDateLimite() != null) {
+            LocalDateTime dateLimite = jobOffer.getDateLimite().toLocalDate().atStartOfDay();
+            LocalDateTime now = LocalDateTime.now();
+            if (dateLimite.isBefore(now)) {
+                throw new RuntimeException("La date limite pour cette offre est expirée");
+            }
         }
 
         // Vérifier si le candidat n'a pas déjà postulé
         if (candidateApplicationRepository.existsByCandidateIdAndJobOfferId(candidateId, jobOfferId)) {
-            throw new RuntimeException("Vous avez déjà postulé à cette offre");
+            throw new AlreadyAppliedException("Vous avez déjà postulé à cette offre");
         }
 
         // Upload du CV
@@ -155,7 +159,7 @@ public class CandidateJobOfferService {
     @Transactional(readOnly = true)
     public CandidateApplicationDetailDTO getCandidateApplicationDetail(Long applicationId, Long candidateId) {
         Application application = candidateApplicationRepository.findByIdAndCandidateId(applicationId, candidateId)
-                .orElseThrow(() -> new RuntimeException("Candidature non trouvée"));
+                .orElseThrow(() -> new ApplicationNotFoundException("Candidature non trouvée"));
 
         return mapToDetailDTO(application);
     }
@@ -165,44 +169,55 @@ public class CandidateJobOfferService {
      */
     @Transactional
     public void withdrawApplication(Long applicationId, Long candidateId) {
-        Application application = candidateApplicationRepository.findByIdAndCandidateId(applicationId, candidateId)
-                .orElseThrow(() -> new RuntimeException("Candidature non trouvée"));
+        Application application = candidateApplicationRepository
+                .findByIdAndCandidateId(applicationId, candidateId)
+                .orElseThrow(() -> new ResourceNotFoundException("Candidature non trouvée."));
 
         // On peut retirer uniquement si le statut est SUBMITTED ou UNDER_REVIEW
         if (application.getApplicationStatus() != ApplicationStatus.SUBMITTED &&
                 application.getApplicationStatus() != ApplicationStatus.UNDER_REVIEW) {
-            throw new RuntimeException("Vous ne pouvez plus retirer cette candidature");
+            throw new InvalidActionException("Vous ne pouvez plus retirer cette candidature.");
         }
 
         application.setApplicationStatus(ApplicationStatus.WITHDRAWN);
         candidateApplicationRepository.save(application);
     }
 
+
     // Méthode privée pour uploader le CV
     private String uploadCV(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new FileStorageException("Le fichier CV est vide ou invalide.");
+        }
+
         try {
-            // Créer le répertoire s'il n'existe pas
+
             Path uploadPath = Paths.get(UPLOAD_DIR);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
 
-            // Générer un nom de fichier unique
+            // Vérifier le nom du fichier
             String originalFilename = file.getOriginalFilename();
+            if (originalFilename == null || !originalFilename.contains(".")) {
+                throw new FileStorageException("Le fichier doit avoir une extension valide.");
+            }
+
+            // Générer un nom de fichier unique
             String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
-            String uniqueFilename = UUID.randomUUID().toString() + fileExtension;
+            String uniqueFilename = UUID.randomUUID() + fileExtension;
 
             // Sauvegarder le fichier
             Path filePath = uploadPath.resolve(uniqueFilename);
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-            // Retourner l'URL du fichier
             return "/uploads/cvs/" + uniqueFilename;
 
         } catch (IOException e) {
-            throw new RuntimeException("Erreur lors de l'upload du CV: " + e.getMessage());
+            throw new FileStorageException("Erreur lors de l'upload du CV : " + e.getMessage());
         }
     }
+
 
     // Méthodes de mapping privées
     private PublicJobOfferListDTO mapToPublicListDTO(JobOffer jobOffer) {
