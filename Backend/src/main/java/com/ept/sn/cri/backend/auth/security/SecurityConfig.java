@@ -31,6 +31,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(req->
                         req.requestMatchers(
                                 "/auth/**",
+                                "/api/v1/webhook/ia-result",
                                 "/v2/api-docs",
                                 "/v3/api-docs",
                                 "/v3/api-docs/**",

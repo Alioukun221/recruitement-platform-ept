@@ -16,15 +16,6 @@ class Education(BaseModel):
     year: Optional[str] = Field(None, description="Année d'obtention")
     field_of_study: Optional[str] = Field(None, description="Domaine d'études")
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "degree": "Master en Informatique",
-                "institution": "Université Cheikh Anta Diop",
-                "year": "2023",
-                "field_of_study": "Génie Logiciel"
-            }
-        }
 
 class WorkExperience(BaseModel):
     """Modèle pour une expérience professionnelle"""
@@ -34,6 +25,10 @@ class WorkExperience(BaseModel):
     end_date: Optional[str] = Field(None, description="Date de fin (ou 'Présent')")
     description: Optional[str] = Field(None, description="Description des responsabilités")
     achievements: Optional[List[str]] = Field(default_factory=list, description="Réalisations clés")
+
+    @property
+    def duration(self) -> str:
+        return f"{self.start_date or 'inconnu'} - {self.end_date or 'présent'}"
 
     class Config:
         json_schema_extra = {
@@ -97,21 +92,7 @@ class ResumeData(BaseModel):
     # Autres
     summary: Optional[str] = Field(None, description="Résumé professionnel")
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "full_name": "Moussa Kane",
-                "email": "moussa.kane@example.com",
-                "competences": ["Python", "Java", "React"],
-                "education": [
-                    {
-                        "degree": "Master",
-                        "institution": "UCAD",
-                        "year": "2023"
-                    }
-                ]
-            }
-        }
+
 
 class JobOffer(BaseModel):
     """Modèle pour une offre d'emploi"""
@@ -143,10 +124,10 @@ class JobOffer(BaseModel):
 class ScoringResult(BaseModel):
     """Modèle pour le résultat du scoring"""
     # Scores détaillés (0-100)
-    score_global: float = Field(..., ge=0, le=100, description="Score global de pertinence")
-    matching_competences: float = Field(..., ge=0, le=100, description="Score de correspondance des compétences")
-    matching_experience: float = Field(..., ge=0, le=100, description="Score de correspondance de l'expérience")
-    matching_diploma: float = Field(..., ge=0, le=100, description="Score de correspondance du diplôme")
+    score_global: float = Field(description="Score global de pertinence")
+    matching_competences: float = Field(description="Score de correspondance des compétences")
+    matching_experience: float = Field(description="Score de correspondance de l'expérience")
+    matching_diploma: float = Field( description="Score de correspondance du diplôme")
 
 
     # Justification détaillée
@@ -160,27 +141,9 @@ class ScoringResult(BaseModel):
     weaknesses: List[str] = Field(default_factory=list, description="Points faibles du candidat")
     missing_skills: List[str] = Field(default_factory=list, description="Compétences manquantes")
 
-    @validator('recommendation')
-    def validate_recommendation(cls, v):
-        valid_recommendations = ['EXCELLENT', 'BON', 'MOYEN', 'FAIBLE']
-        if v not in valid_recommendations:
-            raise ValueError(f'Recommandation doit être parmi: {valid_recommendations}')
-        return v
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "score_global": 85.5,
-                "matching_competences": 90,
-                "matching_experience": 80,
-                "matching_diploma": 85,
-                "justification": "Candidat excellent avec une forte correspondance...",
-                "recommendation": "EXCELLENT",
-                "strengths": ["Maîtrise de Java", "Expérience en microservices"],
-                "weaknesses": ["Manque d'expérience en Kubernetes"],
-                "missing_skills": ["Kubernetes", "AWS"]
-            }
-        }
+
+
 
 # ==================== MODÈLES DE REQUÊTES/RÉPONSES API ====================
 
@@ -280,7 +243,13 @@ class ProcessCVRequest(BaseModel):
                 "filename": "cv_fatima_dieye.pdf",
                 "job_offer": {
                     "job_id": 1,
-                    "job_title": "Développeur Python"
+                    "job_title": "Développeur Python",
+                    "job_type": "FULL_TIME",
+                    "contract_type": "CDI",
+                    "description": "Nous recherchons un développeur Python expérimenté pour travailler sur nos projets backend.",
+                    "required_skills": ["Python", "Django", "FastAPI"],
+                    "education_level": "Master en Informatique",
+                    "min_experience": 3
                 },
                 "callback_url": "http://localhost:8080/api/webhook/ia-result"
             }
@@ -290,7 +259,6 @@ class ProcessCVResponse(BaseModel):
     """Réponse du traitement complet de CV"""
     success: bool = Field(..., description="Succès de l'opération")
     application_id: int = Field(..., description="ID de la candidature")
-    parsed_data: Optional[ResumeData] = Field(None, description="Données extraites du CV")
     scoring_result: Optional[ScoringResult] = Field(None, description="Résultat du scoring")
     error_message: Optional[str] = Field(None, description="Message d'erreur si échec")
     total_processing_time: float = Field(..., description="Temps total de traitement en secondes")
@@ -300,7 +268,6 @@ class ProcessCVResponse(BaseModel):
             "example": {
                 "success": True,
                 "application_id": 25,
-                "parsed_data": {"full_name": "Fatima Dieye"},
                 "scoring_result": {"score_global": 85.5},
                 "error_message": None,
                 "total_processing_time": 5.7

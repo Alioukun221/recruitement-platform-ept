@@ -78,7 +78,9 @@ public class AuthenticationService {
         claims.put("role", user.getRole().name());
         var jwtToken = jwtService.generateToken(claims,user);
         return AuthResponse.builder()
-                .token(jwtToken).build();
+                .token(jwtToken)
+                .role(user.getRole().name())
+                .build();
     }
 
     public void registerCommissionMember(@Valid CommissionMemberRequest request) {

@@ -128,85 +128,6 @@ async def health_check():
             detail=f"Service unhealthy: {str(e)}"
         )
 
-@app.post(
-    "/api/ia/parse-cv",
-    response_model=ParseCVResponse,
-    tags=["Parsing"],
-    status_code=status.HTTP_200_OK
-)
-async def parse_cv(request: ParseCVRequest):
-    """
-    Parse un CV et extrait les données structurées
-
-    - **application_id**: ID de la candidature
-    - **cv_base64**: CV encodé en base64
-    - **filename**: Nom du fichier
-    """
-    logger.info(f"📄 Requête de parsing reçue pour candidature {request.application_id}")
-
-    try:
-        result = parsing_service.parse_cv(
-            cv_base64=request.cv_base64,
-            application_id=request.application_id
-        )
-
-        if not result.success:
-            logger.warning(
-                f" Parsing échoué pour candidature {request.application_id}: "
-                f"{result.error_message}"
-            )
-
-        return result
-
-    except Exception as e:
-        logger.error(f" Erreur inattendue lors du parsing: {e}", exc_info=True)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Erreur lors du parsing: {str(e)}"
-        )
-
-
-@app.post(
-    "/api/ia/score-cv",
-    response_model=ScoreCVResponse,
-    tags=["Scoring"],
-    status_code=status.HTTP_200_OK
-)
-async def score_cv(request: ScoreCVRequest):
-    """
-    Score un CV par rapport à une offre d'emploi
-
-    - **application_id**: ID de la candidature
-    - **parsed_cv_data**: Données du CV parsé
-    - **job_offer**: Données de l'offre d'emploi
-    """
-    logger.info(
-        f" Requête de scoring reçue pour candidature {request.application_id} "
-        f"(offre: {request.job_offer.job_title})"
-    )
-
-    try:
-        result = scoring_service.score_cv(
-            cv_data=request.parsed_cv_data,
-            job_offer=request.job_offer,
-            application_id=request.application_id
-        )
-
-        if not result.success:
-            logger.warning(
-                f" Scoring échoué pour candidature {request.application_id}: "
-                f"{result.error_message}"
-            )
-
-        return result
-
-    except Exception as e:
-        logger.error(f" Erreur inattendue lors du scoring: {e}", exc_info=True)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Erreur lors du scoring: {str(e)}"
-        )
-
 async def send_callback(callback_url: str, data: dict):
     """
     Envoie un callback asynchrone au service Spring Boot
@@ -222,7 +143,6 @@ async def send_callback(callback_url: str, data: dict):
             logger.info(f" Callback envoyé avec succès à {callback_url}")
     except Exception as e:
         logger.error(f" Erreur lors de l'envoi du callback à {callback_url}: {e}")
-
 
 @app.post(
     "/api/ia/process-cv",
@@ -257,7 +177,8 @@ async def process_cv(
         logger.info(f" Étape 1/2: Parsing du CV...")
         parse_result = parsing_service.parse_cv(
             cv_base64=request.cv_base64,
-            application_id=request.application_id
+            application_id=request.application_id,
+            filename = request.filename
         )
 
         if not parse_result.success:
@@ -265,7 +186,6 @@ async def process_cv(
             return ProcessCVResponse(
                 success=False,
                 application_id=request.application_id,
-                parsed_data=None,
                 scoring_result=None,
                 error_message=f"Parsing échoué: {parse_result.error_message}",
                 total_processing_time=time.time() - start_time
@@ -284,7 +204,6 @@ async def process_cv(
             return ProcessCVResponse(
                 success=False,
                 application_id=request.application_id,
-                parsed_data=parse_result.parsed_data,
                 scoring_result=None,
                 error_message=f"Scoring échoué: {score_result.error_message}",
                 total_processing_time=time.time() - start_time
@@ -296,7 +215,6 @@ async def process_cv(
         response = ProcessCVResponse(
             success=True,
             application_id=request.application_id,
-            parsed_data=parse_result.parsed_data,
             scoring_result=score_result.scoring_result,
             error_message=None,
             total_processing_time=total_time
@@ -326,7 +244,6 @@ async def process_cv(
         return ProcessCVResponse(
             success=False,
             application_id=request.application_id,
-            parsed_data=None,
             scoring_result=None,
             error_message=f"Erreur inattendue: {str(e)}",
             total_processing_time=total_time
@@ -362,16 +279,5 @@ async def general_exception_handler(request, exc):
 if __name__ == "__main__":
     import uvicorn
 
-    # Configuration du serveur
-    port = int(os.getenv("PORT", 8000))
-    host = os.getenv("HOST", "0.0.0.0")
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
 
-    logger.info(f" Démarrage du serveur sur {host}:{port}")
-
-    uvicorn.run(
-        "main:app",
-        host=host,
-        port=port,
-        reload=True,  # À désactiver en production
-        log_level="info"
-    )

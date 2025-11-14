@@ -9,7 +9,9 @@ import com.ept.sn.cri.backend.entity.Candidate;
 import com.ept.sn.cri.backend.entity.JobOffer;
 import com.ept.sn.cri.backend.enums.ApplicationStatus;
 import com.ept.sn.cri.backend.exception.*;
+import com.ept.sn.cri.backend.ia.service.IAService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,12 +29,14 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CandidateJobOfferService {
 
 
     private final PublicJobOfferRepository publicJobOfferRepository;
     private final CandidateApplicationRepository candidateApplicationRepository;
     private final CandidateRepository candidateRepository;
+    private final IAService iaService;
 
     // Répertoire pour stocker les CVs
     private final String UPLOAD_DIR = "uploads/cvs/";
@@ -129,6 +133,24 @@ public class CandidateJobOfferService {
         application.setApplicationStatus(ApplicationStatus.SUBMITTED);
 
         Application savedApplication = candidateApplicationRepository.save(application);
+
+        log.info(" Candidature {} créée avec succès", savedApplication.getId());
+
+        //  Lancer le traitement IA en asynchrone
+        if (cvFile != null && !cvFile.isEmpty()) {
+            log.info(" Lancement du traitement IA pour la candidature {}", savedApplication.getId());
+            try {
+                iaService.processCVAsync(savedApplication.getId(), cvFile, jobOffer);
+                log.info(" Traitement IA démarré en arrière-plan pour candidature {}",
+                        savedApplication.getId());
+            } catch (Exception e) {
+                log.error(" Erreur lors du lancement du traitement IA pour candidature {}: {}",
+                        savedApplication.getId(), e.getMessage());
+            }
+        } else {
+            log.warn(" Pas de CV fourni, traitement IA non lancé pour candidature {}",
+                    savedApplication.getId());
+        }
 
         return ApplicationSubmissionResponseDTO.builder()
                 .id(savedApplication.getId())

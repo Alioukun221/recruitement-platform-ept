@@ -43,81 +43,57 @@ class CVParsingService:
             logger.error(f"Health check failed: {e}")
             return False
 
-    def parse_cv(self, cv_path: str, application_id: int, save_folder="save_cvs") -> ParseCVResponse:
-        """
-        Parse un CV PDF et extrait les données structurées.
-
-        Args:
-            :param cv_path: Chemin du fichier PDF à parser
-            :param application_id: ID de la candidature
-            :param save_folder:
-
-        Returns:
-            ParseCVResponse avec les données extraites
-
-        """
+    def parse_cv(self, cv_base64: str, filename: str, application_id: int, save_folder="save_cvs") -> ParseCVResponse:
         start_time = time.time()
-
         try:
-            logger.info(f" Lecture du CV pour la candidature {application_id} : {cv_path}")
 
-            # Encoder le PDF en base64
-            with open(cv_path, "rb") as f:
-                encoded_pdf = base64.b64encode(f.read()).decode("utf-8")
 
-            document_url = f"data:application/pdf;base64,{encoded_pdf}"
+            os.makedirs(save_folder, exist_ok=True)
+            pdf_path = os.path.join(save_folder, filename)
 
-            logger.info(" Appel à Mistral OCR...")
+            pdf_bytes = base64.b64decode(cv_base64)
+            with open(pdf_path, "wb") as f:
+                f.write(pdf_bytes)
+
+
+            document_url = f"data:application/pdf;base64,{cv_base64}"
+
             response = self.client.ocr.process(
                 model=self.model,
                 document=DocumentURLChunk(document_url=document_url),
                 document_annotation_format=response_format_from_pydantic_model(ResumeData),
             )
 
-            # Convertir la réponse JSON en dict
+            if not response.document_annotation:
+                raise ValueError("OCR n'a renvoyé aucune annotation")
+
             response_dict = json.loads(response.document_annotation)
 
-            # Récupère le nom du fichier depuis le chemin
-            original_filename = os.path.basename(cv_path)
-            # Génère un UUID unique
-            unique_id = str(uuid.uuid4())
-            # Crée le nom de fichier final pour le JSON
-            filename = f"{unique_id}_{original_filename}.json"
 
-            # Crée le dossier de sauvegarde s'il n'existe pas
-            os.makedirs(save_folder, exist_ok=True)
-            filepath = os.path.join(save_folder, filename)
-
-            # Sauvegarde locale
-            with open(filepath, "w", encoding="utf-8") as f:
-                json.dump(response_dict, f, indent=2, ensure_ascii=False)
+            try:
+                parsed = ResumeData(**response_dict)
+            except Exception as e:
+                raise ValueError(f"Erreur validation ResumeData : {e}")
 
             processing_time = time.time() - start_time
 
-            logger.info(
-                f" OCR réussi pour la candidature {application_id} "
-                f"(Temps total: {processing_time:.2f}s)"
-            )
 
             return ParseCVResponse(
                 success=True,
                 application_id=application_id,
-                parsed_data= ResumeData(**response_dict),
+                parsed_data=parsed,
                 processing_time=processing_time,
-                error_message=None,
+                error_message=None
             )
 
         except Exception as e:
             processing_time = time.time() - start_time
-            error_msg = f"Erreur lors du parsing du CV: {str(e)}"
-            logger.error(f" {error_msg}", exc_info=True)
-
             return ParseCVResponse(
                 success=False,
                 application_id=application_id,
                 parsed_data=None,
                 processing_time=processing_time,
-                error_message=error_msg,
+                error_message=str(e)
             )
 
 

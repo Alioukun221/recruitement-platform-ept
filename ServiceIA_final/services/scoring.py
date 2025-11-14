@@ -156,11 +156,11 @@ class CVScoringService:
         ])
 
         projects_str = "; ".join([
-            f"{proj.title}: {proj.description}..."
+            f"{proj.name}: {proj.description}..."
             for proj in cv_data.projects
         ])
         languages_str = ", ".join([
-            f"{lang.name} ({lang.level})"
+            f"{lang.language} ({lang.level})"
             for lang in cv_data.languages
         ])
 

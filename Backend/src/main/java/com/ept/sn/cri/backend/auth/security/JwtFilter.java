@@ -31,11 +31,12 @@ public class JwtFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        if(request.getServletPath().contains("/api/v1/auth")) {
+        if (request.getServletPath().contains("/api/v1/auth")
+                || request.getServletPath().contains("/api/v1/webhook/ia-result")) {
+
             filterChain.doFilter(request, response);
             return;
         }
-
         final String authHeader = request.getHeader(AUTHORIZATION);
         final String jwt ;
         final String email;
