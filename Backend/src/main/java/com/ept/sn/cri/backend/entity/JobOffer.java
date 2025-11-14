@@ -70,7 +70,7 @@ public class JobOffer {
     private Date lastModifiedDate;
 
     @Future(message = "La date limite doit être dans le futur.")
-    private LocalDateTime dateLimite;
+    private Date dateLimite;
 
 
     @OneToMany(mappedBy = "jobOffer", cascade = CascadeType.ALL, orphanRemoval = true)

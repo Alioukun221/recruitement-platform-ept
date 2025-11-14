@@ -25,7 +25,7 @@ public class PublicJobOfferDetailDTO {
     private String niveauEtudeRequis;
     private Integer experienceMin;
     private Date datePublication;
-    private LocalDateTime dateLimite;
+    private Date dateLimite;
     private Integer applicationCount;
     private String companyName; // a changer apres
 }

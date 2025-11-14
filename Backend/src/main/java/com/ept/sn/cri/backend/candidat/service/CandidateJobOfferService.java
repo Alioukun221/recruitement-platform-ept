@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -101,8 +102,14 @@ public class CandidateJobOfferService {
             throw new ResourceNotFoundException("Offre d'emploi non trouvée ou non disponible");
         }
         if (jobOffer.getDateLimite() != null) {
-            LocalDateTime dateLimite = jobOffer.getDateLimite().toLocalDate().atStartOfDay();
+            LocalDateTime dateLimite = jobOffer.getDateLimite()
+                    .toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate()
+                    .atStartOfDay();
+
             LocalDateTime now = LocalDateTime.now();
+
             if (dateLimite.isBefore(now)) {
                 throw new RuntimeException("La date limite pour cette offre est expirée");
             }
@@ -243,6 +250,14 @@ public class CandidateJobOfferService {
 
     // Méthodes de mapping privées
     private PublicJobOfferListDTO mapToPublicListDTO(JobOffer jobOffer) {
+
+        List<String> skillsList = List.of();
+        if (jobOffer.getRequiredSkills() != null && !jobOffer.getRequiredSkills().isBlank()) {
+            // Séparateurs possibles : ',' ';' '|'
+            skillsList = List.of(jobOffer.getRequiredSkills().split("\\s*[,;|]\\s*"));
+        }
+
+
         return PublicJobOfferListDTO.builder()
                 .id(jobOffer.getId())
                 .jobTitle(jobOffer.getJobTitle())
@@ -256,6 +271,7 @@ public class CandidateJobOfferService {
                 .datePublication(jobOffer.getDatePublication())
                 .dateLimite(jobOffer.getDateLimite())
                 .applicationCount(jobOffer.getApplications() != null ? jobOffer.getApplications().size() : 0)
+                .requiredSkills(skillsList)
                 .build();
     }
 

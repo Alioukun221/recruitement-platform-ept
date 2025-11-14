@@ -1,4 +1,4 @@
-package com.ept.sn.cri.backend.common.config;
+package com.ept.sn.cri.backend.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -24,6 +25,7 @@ public class PublicJobOfferListDTO {
     private String niveauEtudeRequis;
     private Integer experienceMin;
     private Date datePublication;
-    private LocalDateTime dateLimite;
+    private Date dateLimite;
     private Integer applicationCount;
+    private List<String> requiredSkills;
 }

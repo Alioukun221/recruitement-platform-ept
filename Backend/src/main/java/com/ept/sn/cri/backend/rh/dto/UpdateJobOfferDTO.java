@@ -29,5 +29,5 @@ public class UpdateJobOfferDTO {
     private Integer experienceMin;
 
     @Future(message = "La date limite doit être dans le futur.")
-    private LocalDateTime dateLimite;
+    private Date dateLimite;
 }

@@ -23,6 +23,6 @@ public class JobOfferListDTO {
     private ContratType typeContrat;
     private JobStatus jobStatus;
     private Date datePublication;
-    private LocalDateTime dateLimite;
+    private Date dateLimite;
     private Integer applicationCount;
 }

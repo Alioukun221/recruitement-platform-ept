@@ -29,7 +29,7 @@ public class JobOfferResponseDTO {
     private Integer experienceMin;
     private Date datePublication;
     private Date lastModifiedDate;
-    private LocalDateTime dateLimite;
+    private Date dateLimite;
     private Long createdById;
     private String createdByName;
     private Integer applicationCount;

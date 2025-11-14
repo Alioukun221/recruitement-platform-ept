@@ -1,4 +1,4 @@
-package com.ept.sn.cri.backend.common.config;
+package com.ept.sn.cri.backend.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

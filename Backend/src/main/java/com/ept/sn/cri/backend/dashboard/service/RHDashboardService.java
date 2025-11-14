@@ -127,9 +127,9 @@ public class RHDashboardService {
             jobOffersByContract.put(jobOffer.getTypeContrat().name(),
                     jobOffersByContract.getOrDefault(jobOffer.getTypeContrat().name(), 0) + 1);
 
-            @Future(message = "La date limite doit être dans le futur.") LocalDateTime dateSql = jobOffer.getDateLimite();
+            @Future(message = "La date limite doit être dans le futur.") Date dateSql = jobOffer.getDateLimite();
             if (dateSql != null) {
-                LocalDate dateLimite = dateSql.toLocalDate();
+                LocalDate dateLimite = LocalDate.ofInstant(dateSql.toInstant(),  ZoneId.systemDefault());
 
                 if (!dateLimite.isBefore(today) && !dateLimite.isAfter(sevenDaysFromNow)) {
                     jobOffersExpiringSoon++;
@@ -352,13 +352,14 @@ public class RHDashboardService {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime sevenDaysFromNow = now.plusDays(7);
 
+
         long expiringSoon = allJobOffers.stream()
                 .filter(jo -> jo.getDateLimite() != null)
                 .filter(jo -> {
-                    // Conversion sécurisée
-                    LocalDateTime dateLimite = jo.getDateLimite()
-                            .toLocalDate()          // java.sql.Date -> LocalDate
-                            .atStartOfDay();        // LocalDate -> LocalDateTime à minuit
+                    LocalDateTime dateLimite = LocalDateTime.ofInstant(
+                            jo.getDateLimite().toInstant(),
+                            ZoneId.systemDefault()
+                    );
                     return dateLimite.isAfter(now) && dateLimite.isBefore(sevenDaysFromNow);
                 })
                 .count();

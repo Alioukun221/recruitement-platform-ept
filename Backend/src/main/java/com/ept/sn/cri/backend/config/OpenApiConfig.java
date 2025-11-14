@@ -1,4 +1,4 @@
-package com.ept.sn.cri.backend.common.config;
+package com.ept.sn.cri.backend.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
