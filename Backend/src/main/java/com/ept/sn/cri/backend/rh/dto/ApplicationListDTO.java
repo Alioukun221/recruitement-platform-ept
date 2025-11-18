@@ -18,7 +18,7 @@ public class ApplicationListDTO {
     private String candidateName;
     private String candidateEmail;
     private String highestDegree;
-    private String specialization;
+    private String majorField;
     private ApplicationStatus status;
     private Integer scoreIA;
     private LocalDateTime submitDate;

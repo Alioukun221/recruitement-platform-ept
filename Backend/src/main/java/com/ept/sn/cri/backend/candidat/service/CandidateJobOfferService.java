@@ -135,7 +135,17 @@ public class CandidateJobOfferService {
         application.setEmail(dto.getEmail());
         application.setAddress(dto.getAddress());
         application.setHighestDegree(dto.getHighestDegree());
-        application.setSpecialization(dto.getSpecialization());
+        application.setMajorField(dto.getMajorField());
+        application.setPhoneNumber(dto.getPhoneNumber());
+        application.setNationality(dto.getNationality());
+        application.setEducationalInstitution(dto.getEducationalInstitution());
+        application.setYearOfGraduation(dto.getYearOfGraduation());
+        application.setMotivationEcole(dto.getMotivationEcole());
+        application.setMotivationPosition(dto.getMotivationPosition());
+        application.setAvailableImmediately(dto.isAvailableImmediately());
+        application.setCertifyAccurate(dto.isCertifyAccurate());
+        application.setConsentGDPR(dto.isConsentGDPR());
+        application.setElectronicSignature(dto.getElectronicSignature());
         application.setCvUrl(cvUrl);
         application.setApplicationStatus(ApplicationStatus.SUBMITTED);
 
@@ -143,21 +153,21 @@ public class CandidateJobOfferService {
 
         log.info(" Candidature {} créée avec succès", savedApplication.getId());
 
-        //  Lancer le traitement IA en asynchrone
-        if (cvFile != null && !cvFile.isEmpty()) {
-            log.info(" Lancement du traitement IA pour la candidature {}", savedApplication.getId());
-            try {
-                iaService.processCVAsync(savedApplication.getId(), cvFile, jobOffer);
-                log.info(" Traitement IA démarré en arrière-plan pour candidature {}",
-                        savedApplication.getId());
-            } catch (Exception e) {
-                log.error(" Erreur lors du lancement du traitement IA pour candidature {}: {}",
-                        savedApplication.getId(), e.getMessage());
-            }
-        } else {
-            log.warn(" Pas de CV fourni, traitement IA non lancé pour candidature {}",
-                    savedApplication.getId());
-        }
+//        //  Lancer le traitement IA en asynchrone
+//        if (cvFile != null && !cvFile.isEmpty()) {
+//            log.info(" Lancement du traitement IA pour la candidature {}", savedApplication.getId());
+//            try {
+//                iaService.processCVAsync(savedApplication.getId(), cvFile, jobOffer);
+//                log.info(" Traitement IA démarré en arrière-plan pour candidature {}",
+//                        savedApplication.getId());
+//            } catch (Exception e) {
+//                log.error(" Erreur lors du lancement du traitement IA pour candidature {}: {}",
+//                        savedApplication.getId(), e.getMessage());
+//            }
+//        } else {
+//            log.warn(" Pas de CV fourni, traitement IA non lancé pour candidature {}",
+//                    savedApplication.getId());
+//        }
 
         return ApplicationSubmissionResponseDTO.builder()
                 .id(savedApplication.getId())
@@ -321,7 +331,7 @@ public class CandidateJobOfferService {
                 .email(application.getEmail())
                 .address(application.getAddress())
                 .highestDegree(application.getHighestDegree())
-                .specialization(application.getSpecialization())
+                .specialization(application.getMajorField())
                 .cvUrl(application.getCvUrl())
                 .status(application.getApplicationStatus().name())
                 .submitDate(application.getSubmitDate())

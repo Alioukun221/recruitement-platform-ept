@@ -62,18 +62,43 @@ public class CandidateJobOfferController {
     @PostMapping(value = "/job-offers/{jobOfferId}/apply", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApplicationSubmissionResponseDTO> submitApplication(
             @PathVariable Long jobOfferId,
+
+            // Step 1
             @RequestParam String firstName,
             @RequestParam String lastName,
             @RequestParam String email,
+            @RequestParam(required = false) String phoneNumber,
             @RequestParam(required = false) String address,
+            @RequestParam(required = false) String nationality,
+
+            // Step 2
             @RequestParam String highestDegree,
-            @RequestParam String specialization,
+            @RequestParam String majorField,
+            @RequestParam(required = false) String educationalInstitution,
+            @RequestParam(required = false) String yearOfGraduation,
+
+            // Step 3
             @RequestParam(required = false) MultipartFile cv,
+            @RequestParam(required = false) MultipartFile[] documents,
+
+            // Step 4
+            @RequestParam(required = false) String motivationEcole,
+            @RequestParam(required = false) String motivationPosition,
+            @RequestParam(defaultValue = "false") boolean availableImmediately,
+
+            // Step 5
+            @RequestParam(defaultValue = "false") boolean certifyAccurate,
+            @RequestParam(defaultValue = "false") boolean consentGDPR,
+            @RequestParam(required = false) String electronicSignature,
+
             @AuthenticationPrincipal User user) {
 
         // Construire le DTO avec les données du formulaire
         SubmitApplicationDTO dto = new SubmitApplicationDTO(
-                firstName, lastName, email, address, highestDegree, specialization
+                firstName, lastName, email, phoneNumber, address, nationality,
+                highestDegree, majorField, educationalInstitution, yearOfGraduation,
+                motivationEcole, motivationPosition, availableImmediately,
+                certifyAccurate, consentGDPR, electronicSignature
         );
 
         // Soumettre la candidature

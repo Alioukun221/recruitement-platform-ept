@@ -50,8 +50,6 @@ public class Application {
     @Column(length = 50)
     private String highestDegree;
 
-    @Column(length = 255)
-    private String specialization;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -73,6 +71,25 @@ public class Application {
     @JsonIgnore
     @Column(length = 2000)
     private String justificationIA;
+
+    private String phoneNumber;
+    private String nationality;
+
+    private String majorField;
+    private String educationalInstitution;
+    private String yearOfGraduation;
+
+    @Column(length = 2000)
+    private String motivationEcole;
+
+    @Column(length = 2000)
+    private String motivationPosition;
+
+    private Boolean availableImmediately;
+
+    private Boolean certifyAccurate;
+    private Boolean consentGDPR;
+    private String electronicSignature;
 
 
     @CreatedDate

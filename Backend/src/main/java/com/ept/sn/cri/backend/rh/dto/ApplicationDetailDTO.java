@@ -25,7 +25,7 @@ public class ApplicationDetailDTO {
 
     // Informations académiques et professionnelles
     private String highestDegree;
-    private String specialization;
+    private String majorField;
     private String cvUrl;
 
     // Statut
