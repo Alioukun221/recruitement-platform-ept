@@ -28,17 +28,18 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain filterChain)
+                                    @NonNull FilterChain filterChain)  // ✅ FilterChain, pas FilterChainProxy
             throws ServletException, IOException {
 
+        // ✅ Ne bypasse que /auth et /webhook
         if (request.getServletPath().contains("/auth")
-                || request.getServletPath().contains("/webhook/ia-result") || request.getServletPath().contains("/candidate/job-offers/")) {
-
+                || request.getServletPath().contains("/webhook/ia-result")) {
             filterChain.doFilter(request, response);
             return;
         }
+
         final String authHeader = request.getHeader(AUTHORIZATION);
-        final String jwt ;
+        final String jwt;
         final String email;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -46,14 +47,17 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-
         jwt = authHeader.substring(7);
         email = jwtService.extractUsername(jwt);
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails =  userDetailsService.loadUserByUsername(email);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-            if(jwtService.isTokenValid(jwt, userDetails)) {
+            if (jwtService.isTokenValid(jwt, userDetails)) {
+                // ✅ Ajoute un log pour vérifier
+                System.out.println("🔍 User authentifié : " + userDetails.getUsername());
+                System.out.println("🔍 Authorities : " + userDetails.getAuthorities());
+
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
@@ -63,6 +67,8 @@ public class JwtFilter extends OncePerRequestFilter {
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+
+                System.out.println("✅ Authentication set in SecurityContext");
             }
         }
 

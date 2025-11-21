@@ -32,6 +32,7 @@ public class SecurityConfig {
                                 "/auth/**",
                                 "/webhook/**",
                                 "/candidate/job-offers/**",
+                                "/candidate/my-applications/**",
                                 "/v2/api-docs",
                                 "/v3/api-docs",
                                 "/v3/api-docs/**",
