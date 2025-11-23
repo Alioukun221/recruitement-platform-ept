@@ -38,6 +38,15 @@ public class CommissionController {
     }
 
     /**
+     * Obtenir tous les users qui ont un role commission_member
+     */
+
+    @GetMapping("/get_all_commissions_members")
+    public List<CommissionMemberUserDTO> getAllCommissionMemberUsers() {
+        return commissionService.getAllCommissionMembersUsers();
+    }
+
+    /**
      * Ajouter un membre à une commission
      */
     @PreAuthorize("hasAuthority('RH')")

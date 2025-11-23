@@ -39,7 +39,7 @@ public abstract class User implements UserDetails, Principal {
     @Column(nullable = false, length = 50)
     private String lastName;
 
-    @Column(unique = true, length = 20)
+    @Column( length = 20)
     private String phoneNumber;
 
     @Enumerated(EnumType.STRING)

@@ -1,6 +1,7 @@
 package com.ept.sn.cri.backend.rh.repository;
 
 import com.ept.sn.cri.backend.entity.CommissionMember;
+import com.ept.sn.cri.backend.entity.User;
 import com.ept.sn.cri.backend.enums.CommissionRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,6 +16,9 @@ public interface CommissionMemberRepository extends JpaRepository<CommissionMemb
 
     // Trouver tous les membres d'une commission
     List<CommissionMember> findByCommissionId(Long commissionId);
+
+
+
 
     // Trouver le président d'une commission
     Optional<CommissionMember> findByCommissionIdAndRole(Long commissionId, CommissionRole role);

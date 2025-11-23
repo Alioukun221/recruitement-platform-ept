@@ -79,7 +79,7 @@ public class CandidateJobOfferController {
 
             // Step 3
             @RequestParam(required = false) MultipartFile cv,
-            @RequestParam(required = false) MultipartFile[] documents,
+
 
             // Step 4
             @RequestParam(required = false) String motivationEcole,

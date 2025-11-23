@@ -61,6 +61,26 @@ public class CommissionService {
     }
 
     /**
+     * Retourner la liste des users qui sont des commission_member
+     */
+
+    public List<CommissionMemberUserDTO> getAllCommissionMembersUsers() {
+        return userRepository.findAllCommissionMembers()
+                .stream()
+                .map(this::mapToCommissionMemberUserDTO)
+                .toList();
+    }
+
+    private CommissionMemberUserDTO mapToCommissionMemberUserDTO(User user) {
+        CommissionMemberUserDTO dto = new CommissionMemberUserDTO();
+        dto.setId(user.getId());
+        dto.setFirstName(user.getFirstName());
+        dto.setLastName(user.getLastName());
+        dto.setEmail(user.getEmail());
+        return dto;
+    }
+
+    /**
      * Ajouter un membre à la commission
      */
     @Transactional
