@@ -93,12 +93,12 @@ public class CommissionService {
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur non trouvé avec l'ID : " + dto.getUserId()));
 
-        // Vérifier que l'utilisateur n'est pas déjà membre
-        if (commissionMemberRepository.existsByCommissionIdAndId(commissionId, dto.getUserId())) {
+        // Vérifier que l'utilisateur n'est pas déjà membre de cette commission
+        if (commissionMemberRepository.existsByUserIdAndCommissionId(user.getId(), commissionId)) {
             throw new InvalidActionException("Cet utilisateur est déjà membre de la commission");
         }
 
-        // Convertir le rôle
+
         CommissionRole role;
         try {
             role = CommissionRole.valueOf(dto.getRole().toUpperCase());
@@ -106,25 +106,31 @@ public class CommissionService {
             throw new InvalidActionException("Rôle invalide. Utilisez 'PRESIDENT' ou 'MEMBER'");
         }
 
-        // Si le rôle est PRESIDENT, vérifier qu'il n'y a pas déjà un président
-        if (role == CommissionRole.PRESIDENT) {
-            if (commissionMemberRepository.hasPresident(commissionId)) {
-                throw new InvalidActionException("Cette commission a déjà un président");
-            }
+        if (role == CommissionRole.PRESIDENT && commissionMemberRepository.hasPresident(commissionId)) {
+            throw new InvalidActionException("Cette commission a déjà un président");
         }
 
-        // Créer le membre
-        CommissionMember member = new CommissionMember();
-        member.setFirstName(user.getFirstName());
-        member.setLastName(user.getLastName());
-        member.setEmail(user.getEmail());
-        member.setPassword(user.getPassword());
-        member.setRole(user.getRole());
+        CommissionMember member;
+        if (user instanceof CommissionMember) {
+            member = (CommissionMember) user;
+        } else {
+            member = new CommissionMember();
+            member.setId(user.getId());  // pour ne pas dupliquer
+            member.setFirstName(user.getFirstName());
+            member.setLastName(user.getLastName());
+            member.setEmail(user.getEmail());
+            member.setPassword(user.getPassword());
+            member.setRole(user.getRole());
+        }
+
+        member.setCommission(commission);
+        member.setCommissionRole(role);
         member.setExpertiseArea(dto.getExpertiseArea());
 
         CommissionMember savedMember = commissionMemberRepository.save(member);
         return mapToMemberResponseDTO(savedMember);
     }
+
 
     /**
      * Changer le président de la commission
