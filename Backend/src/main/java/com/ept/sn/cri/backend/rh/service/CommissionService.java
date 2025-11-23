@@ -98,7 +98,7 @@ public class CommissionService {
             throw new InvalidActionException("Cet utilisateur est déjà membre de la commission");
         }
 
-
+        // Convertir le rôle
         CommissionRole role;
         try {
             role = CommissionRole.valueOf(dto.getRole().toUpperCase());
@@ -106,16 +106,18 @@ public class CommissionService {
             throw new InvalidActionException("Rôle invalide. Utilisez 'PRESIDENT' ou 'MEMBER'");
         }
 
+        // Vérifier qu'il n'y a pas déjà un président si le rôle choisi est PRESIDENT
         if (role == CommissionRole.PRESIDENT && commissionMemberRepository.hasPresident(commissionId)) {
             throw new InvalidActionException("Cette commission a déjà un président");
         }
+
 
         CommissionMember member;
         if (user instanceof CommissionMember) {
             member = (CommissionMember) user;
         } else {
             member = new CommissionMember();
-            member.setId(user.getId());  // pour ne pas dupliquer
+            member.setId(user.getId());  //  l'ID existant pour ne pas créer de doublon
             member.setFirstName(user.getFirstName());
             member.setLastName(user.getLastName());
             member.setEmail(user.getEmail());
@@ -123,12 +125,18 @@ public class CommissionService {
             member.setRole(user.getRole());
         }
 
+        // Associer le membre à la commission
         member.setCommission(commission);
         member.setCommissionRole(role);
         member.setExpertiseArea(dto.getExpertiseArea());
 
-        CommissionMember savedMember = commissionMemberRepository.save(member);
-        return mapToMemberResponseDTO(savedMember);
+        // Ajouter le membre à la liste de la commission
+        commission.getMembers().add(member);
+
+        // Sauvegarder la commission pour persister la relation
+        commissionRepository.save(commission);
+
+        return mapToMemberResponseDTO(member);
     }
 
 
