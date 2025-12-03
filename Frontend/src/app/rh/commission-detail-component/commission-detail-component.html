@@ -1,0 +1,237 @@
+<div class="commission-detail-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Chargement des détails...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-error">
+    <span class="alert-icon">⚠️</span>
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    <span class="alert-icon">✅</span>
+    <p>{{ successMessage }}</p>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!isLoading && commission" class="content">
+    <!-- Header -->
+    <header class="page-header">
+      <div class="header-content">
+        <div>
+          <h1 class="page-title">{{ commission.name }}</h1>
+          <p class="page-subtitle">Commission créée le {{ formatDate(commission.createdAt) }}</p>
+        </div>
+        <div class="header-actions">
+          <span class="status-badge" [ngClass]="'status-' + commission.status?.toLowerCase()">
+            {{ getStatusLabel(commission.status) }}
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Info Section -->
+    <section class="info-section">
+      <h2 class="section-title">Informations générales</h2>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Offre d'emploi associée</span>
+          <span class="info-value">{{ commission.jobOfferTitle || 'N/A' }}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Créée par</span>
+          <span class="info-value">{{ commission.createdByName || 'N/A' }}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Nombre de membres</span>
+          <span class="info-value">{{ commission.memberCount || 0 }}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Dernière mise à jour</span>
+          <span class="info-value">{{ formatDate(commission.updatedAt) }}</span>
+        </div>
+      </div>
+
+      <div *ngIf="commission.description" class="description-box">
+        <h3 class="description-title">Description</h3>
+        <p class="description-text">{{ commission.description }}</p>
+      </div>
+
+      <!-- Edit Mode -->
+      <div *ngIf="isEditMode" class="edit-form">
+        <div class="form-group">
+          <label for="editName" class="form-label">Nom de la commission</label>
+          <input
+            type="text"
+            id="editName"
+            class="form-input"
+            [(ngModel)]="editData.name"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="editDescription" class="form-label">Description</label>
+          <textarea
+            id="editDescription"
+            class="form-textarea"
+            [(ngModel)]="editData.description"
+            rows="4"
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="editStatus" class="form-label">Statut</label>
+          <select
+            id="editStatus"
+            class="form-select"
+            [(ngModel)]="editData.status"
+          >
+            <option value="ACTIVE">Active</option>
+            <option value="CLOSED">Fermée</option>
+            <option value="ARCHIVED">Archivée</option>
+          </select>
+        </div>
+
+        <div class="edit-actions">
+          <button class="btn-secondary" (click)="cancelEdit()">Annuler</button>
+          <button class="btn-primary" (click)="saveEdit()">Enregistrer</button>
+        </div>
+      </div>
+
+      <div *ngIf="!isEditMode" class="section-actions">
+        <button class="btn-edit" (click)="enableEditMode()">
+          ✏️ Modifier les informations
+        </button>
+      </div>
+    </section>
+
+    <!-- President Section -->
+    <section *ngIf="commission.president" class="president-section">
+      <h2 class="section-title">Président de la commission</h2>
+      <div class="president-card">
+        <div class="president-info">
+          <div class="president-avatar">👤</div>
+          <div>
+            <h3 class="president-name">{{ commission.president.userName }}</h3>
+            <p class="president-email">{{ commission.president.userEmail }}</p>
+            <p *ngIf="commission.president.expertiseArea" class="president-expertise">
+              Expertise: {{ commission.president.expertiseArea }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Members Section -->
+    <section class="members-section">
+      <div class="section-header">
+        <h2 class="section-title">Membres de la commission</h2>
+        <button class="btn-add" (click)="toggleAddMemberForm()">
+          {{ showAddMemberForm ? '✕ Annuler' : '+ Ajouter un membre' }}
+        </button>
+      </div>
+
+      <!-- Add Member Form -->
+      <div *ngIf="showAddMemberForm" class="add-member-form">
+        <h3 class="form-title">Ajouter un nouveau membre</h3>
+
+        <div class="form-group">
+          <label for="userId" class="form-label required">Utilisateur</label>
+          <select
+            id="userId"
+            class="form-select"
+            [(ngModel)]="newMember.userId"
+            [class.error]="memberFormErrors['userId']"
+          >
+            <option value="">Sélectionnez un utilisateur</option>
+            <option *ngFor="let user of availableUsers" [ngValue]="user.id">
+              {{ user.firstName }} ({{ user.lastName }})
+            </option>
+          </select>
+          <span *ngIf="memberFormErrors['userId']" class="error-message">
+            {{ memberFormErrors['userId'] }}
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="role" class="form-label required">Rôle</label>
+          <select
+            id="role"
+            class="form-select"
+            [(ngModel)]="newMember.role"
+            [class.error]="memberFormErrors['role']"
+          >
+            <option value="">Sélectionnez un rôle</option>
+            <option *ngFor="let option of roleOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+                <span *ngIf="memberFormErrors['role']" class="error-message">
+          {{ memberFormErrors['role'] }}
+        </span>
+        </div>
+
+        <div class="form-group">
+          <label for="expertiseArea" class="form-label">Domaine d'expertise</label>
+          <input
+            type="text"
+            id="expertiseArea"
+            class="form-input"
+            [(ngModel)]="newMember.expertiseArea"
+            placeholder="Ex: Réseaux, Sécurité informatique..."
+          />
+        </div>
+
+        <div class="form-actions">
+          <button
+            class="btn-primary"
+            (click)="addMemberToCommission()"
+            [disabled]="isAddingMember"
+          >
+            <span *ngIf="!isAddingMember">Ajouter</span>
+            <span *ngIf="isAddingMember" class="loading-text">
+              <span class="spinner-small"></span>
+              Ajout en cours...
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Members List -->
+      <div class="members-list">
+        <div *ngIf="!commission.members || commission.members.length === 0" class="empty-state">
+          <p>Aucun membre dans cette commission pour le moment.</p>
+        </div>
+
+        <div *ngFor="let member of commission.members" class="member-card">
+          <div class="member-avatar">👤</div>
+          <div class="member-info">
+            <h3 class="member-name">{{ member.userName }}</h3>
+            <p class="member-email">{{ member.userEmail }}</p>
+            <div class="member-meta">
+              <span class="member-role">{{ member.role }}</span>
+              <span *ngIf="member.expertiseArea" class="member-expertise">
+                {{ member.expertiseArea }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Back Button -->
+    <div class="back-button-container">
+      <button class="btn-back" (click)="goBack()">
+        ← Retour à la liste des commissions
+      </button>
+    </div>
+  </div>
+</div>

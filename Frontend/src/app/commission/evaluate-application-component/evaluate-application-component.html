@@ -1,0 +1,290 @@
+<div class="evaluate-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" [hidden]="!isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Chargement des informations...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-error">
+    <span class="alert-icon">⚠️</span>
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    <span class="alert-icon">✅</span>
+    <p>{{ successMessage }}</p>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!isLoading && application" class="content">
+    <!-- Header -->
+    <header class="page-header">
+      <div class="header-content">
+        <div>
+          <h1 class="page-title">Évaluation de candidature</h1>
+          <p class="page-subtitle">{{ application.firstName }} {{ application.lastName }} - {{ application.jobOfferTitle }}</p>
+        </div>
+        <button class="btn-back" (click)="goBack()">
+          ← Retour
+        </button>
+      </div>
+    </header>
+
+    <div class="evaluation-layout">
+      <!-- Left Panel - CV Viewer -->
+      <div class="cv-panel">
+        <div class="cv-header">
+          <h2 class="cv-title">Curriculum Vitae</h2>
+          <button *ngIf="cvUrl" class="btn-download" (click)="downloadCV()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Télécharger
+          </button>
+        </div>
+
+        <div class="cv-viewer">
+          <div *ngIf="isLoadingCV" class="cv-loading">
+            <div class="spinner"></div>
+            <p>Chargement du CV...</p>
+          </div>
+
+          <div *ngIf="!isLoadingCV && cvError" class="cv-error">
+            <span class="error-icon">📄❌</span>
+            <p>{{ cvError }}</p>
+          </div>
+
+          <iframe
+            *ngIf="!isLoadingCV && !cvError && cvUrl"
+            [src]="cvUrl"
+            class="cv-iframe"
+            title="CV du candidat"
+          ></iframe>
+
+          <div *ngIf="!isLoadingCV && !cvError && !cvUrl" class="cv-empty">
+            <span class="empty-icon">📄</span>
+            <p>Aucun CV disponible</p>
+          </div>
+        </div>
+
+        <!-- Candidate Info Summary -->
+        <div class="candidate-summary">
+          <h3 class="summary-title">Informations du candidat</h3>
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="summary-label">Email</span>
+              <span class="summary-value">{{ application.email }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Diplôme</span>
+              <span class="summary-value">{{ application.highestDegree }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Domaine</span>
+              <span class="summary-value">{{ application.majorField }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Score IA</span>
+              <span class="summary-value score" [ngClass]="getScoreClass(application.scoreIA)">
+                {{ application.scoreIA || 'N/A' }}%
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Panel - Evaluation Form -->
+      <div class="evaluation-panel">
+        <div class="evaluation-card">
+          <h2 class="evaluation-title">Grille d'évaluation</h2>
+
+          <form class="evaluation-form" (ngSubmit)="submitEvaluation()">
+            <!-- Score Fields -->
+            <div class="score-section">
+              <div class="form-group">
+                <label for="diplomaScore" class="form-label required">
+                  Score Diplôme
+                  <span class="score-indicator">{{ evaluation.diplomaScore }}/5</span>
+                </label>
+                <input
+                  type="range"
+                  id="diplomaScore"
+                  class="form-range"
+                  [(ngModel)]="evaluation.diplomaScore"
+                  name="diplomaScore"
+                  min="0"
+                  max="5"
+                  step="0.25"
+                  [class.error]="formErrors['diplomaScore']"
+                />
+                <div class="range-labels">
+                  <span>0</span>
+                  <span>2.5</span>
+                  <span>5</span>
+                </div>
+                <span *ngIf="formErrors['diplomaScore']" class="error-message">
+                  {{ formErrors['diplomaScore'] }}
+                </span>
+              </div>
+
+              <div class="form-group">
+                <label for="experienceScore" class="form-label required">
+                  Score Expérience
+                  <span class="score-indicator">{{ evaluation.experienceScore }}/5</span>
+                </label>
+                <input
+                  type="range"
+                  id="experienceScore"
+                  class="form-range"
+                  [(ngModel)]="evaluation.experienceScore"
+                  name="experienceScore"
+                  min="0"
+                  max="5"
+                  step="0.25"
+                  [class.error]="formErrors['experienceScore']"
+                />
+                <div class="range-labels">
+                  <span>0</span>
+                  <span>2.5</span>
+                  <span>5</span>
+                </div>
+                <span *ngIf="formErrors['experienceScore']" class="error-message">
+                  {{ formErrors['experienceScore'] }}
+                </span>
+              </div>
+
+              <div class="form-group">
+                <label for="competenceScore" class="form-label required">
+                  Score Compétences Techniques
+                  <span class="score-indicator">{{ evaluation.competenceScore }}/5</span>
+                </label>
+                <input
+                  type="range"
+                  id="competenceScore"
+                  class="form-range"
+                  [(ngModel)]="evaluation.competenceScore"
+                  name="competenceScore"
+                  min="0"
+                  max="5"
+                  step="0.25"
+                  [class.error]="formErrors['competenceScore']"
+                />
+                <div class="range-labels">
+                  <span>0</span>
+                  <span>2.5</span>
+                  <span>5</span>
+                </div>
+                <span *ngIf="formErrors['competenceScore']" class="error-message">
+                  {{ formErrors['competenceScore'] }}
+                </span>
+              </div>
+
+              <div class="form-group">
+                <label for="motivationScore" class="form-label required">
+                  Score Motivation
+                  <span class="score-indicator">{{ evaluation.motivationScore }}/5</span>
+                </label>
+                <input
+                  type="range"
+                  id="motivationScore"
+                  class="form-range"
+                  [(ngModel)]="evaluation.motivationScore"
+                  name="motivationScore"
+                  min="0"
+                  max="5"
+                  step="0.25"
+                  [class.error]="formErrors['motivationScore']"
+                />
+                <div class="range-labels">
+                  <span>0</span>
+                  <span>2.5</span>
+                  <span>5</span>
+                </div>
+                <span *ngIf="formErrors['motivationScore']" class="error-message">
+                  {{ formErrors['motivationScore'] }}
+                </span>
+              </div>
+
+              <div class="form-group">
+                <label for="softSkillsScore" class="form-label required">
+                  Score Soft Skills
+                  <span class="score-indicator">{{ evaluation.softSkillsScore }}/5</span>
+                </label>
+                <input
+                  type="range"
+                  id="softSkillsScore"
+                  class="form-range"
+                  [(ngModel)]="evaluation.softSkillsScore"
+                  name="softSkillsScore"
+                  min="0"
+                  max="5"
+                  step="0.25"
+                  [class.error]="formErrors['softSkillsScore']"
+                />
+                <div class="range-labels">
+                  <span>0</span>
+                  <span>2.5</span>
+                  <span>5</span>
+                </div>
+                <span *ngIf="formErrors['softSkillsScore']" class="error-message">
+                  {{ formErrors['softSkillsScore'] }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Total Score -->
+            <div class="total-score-card">
+              <span class="total-label">Score Total</span>
+              <span class="total-value" [ngClass]="getTotalScoreClass()">
+                {{ getTotalScore() }}/25
+              </span>
+            </div>
+
+            <!-- Comment -->
+            <div class="form-group">
+              <label for="comment" class="form-label">Commentaire</label>
+              <textarea
+                id="comment"
+                class="form-textarea"
+                [(ngModel)]="evaluation.comment"
+                name="comment"
+                rows="6"
+                placeholder="Ajoutez vos observations, remarques et recommandations concernant ce candidat..."
+              ></textarea>
+              <span class="char-count">
+                {{ evaluation.comment?.length || 0 }} caractères
+              </span>
+            </div>
+
+            <!-- Actions -->
+            <div class="form-actions">
+              <button
+                type="button"
+                class="btn-secondary"
+                (click)="goBack()"
+                [disabled]="isSubmitting"
+              >
+                Annuler
+              </button>
+              <button
+                type="submit"
+                class="btn-primary"
+                [disabled]="isSubmitting"
+              >
+                <span *ngIf="!isSubmitting">Soumettre l'évaluation</span>
+                <span *ngIf="isSubmitting" class="loading-text">
+                  <span class="spinner-small"></span>
+                  Enregistrement...
+                </span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

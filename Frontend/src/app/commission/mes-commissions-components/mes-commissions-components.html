@@ -1,0 +1,168 @@
+<div class="header-top">
+  <div class="header-title">
+    <h1>Mes Commissions de Recrutement</h1>
+    <p>Gérez vos évaluations et suivez les candidatures</p>
+  </div>
+  <div class="header-stats hidden-mobile">
+    <p>Commissions actives</p>
+    <p>{{ commissions.length }}</p>
+  </div>
+</div>
+
+<!-- Header -->
+<!--  <div class="header-section">-->
+<!--    <div class="header-content">-->
+
+<!--      &lt;!&ndash; Search & Filter &ndash;&gt;-->
+<!--      <div class="search-filter-bar">-->
+<!--        <div class="search-wrapper">-->
+<!--          <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">-->
+<!--            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />-->
+<!--          </svg>-->
+<!--          <input-->
+<!--            type="text"-->
+<!--            class="search-input"-->
+<!--            placeholder="Rechercher par titre de poste ou commission..."-->
+<!--            [(ngModel)]="searchTerm"-->
+<!--            (ngModelChange)="onSearchChange($event)"-->
+<!--          />-->
+<!--        </div>-->
+
+<!--        <div class="filter-wrapper">-->
+<!--          <svg class="filter-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">-->
+<!--            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />-->
+<!--          </svg>-->
+<!--          <select-->
+<!--            class="filter-select"-->
+<!--            [(ngModel)]="selectedRole"-->
+<!--            (ngModelChange)="onRoleChange($event)"-->
+<!--          >-->
+<!--            <option value="all">Tous les rôles</option>-->
+<!--            <option value="Président">Président</option>-->
+<!--            <option value="Rapporteur">Rapporteur</option>-->
+<!--            <option value="Membre">Membre</option>-->
+<!--          </select>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p class="loading-text">Chargement des commissions...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="error-container">
+    <div class="error-message">{{ error }}</div>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!isLoading && !error" class="main-content">
+    <div class="results-count">
+      <span>{{ filteredCommissions.length }}</span> commission(s) trouvée(s)
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="cards-grid">
+      <div
+        *ngFor="let commission of filteredCommissions"
+        class="commission-card"
+        (click)="navigateToCommission(commission.commissionId)"
+        tabindex="0"
+        (keydown.enter)="navigateToCommission(commission.commissionId)"
+      >
+        <!-- Card Header -->
+        <div class="card-header">
+          <div class="card-header-top">
+            <div class="card-header-content">
+              <h3 class="card-title">{{ commission.jobOfferTitle }}</h3>
+              <p class="card-subtitle">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                {{ commission.commissionName }}
+              </p>
+            </div>
+            <svg class="chevron-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+
+          <!-- Role Badge -->
+          <span [class]="'role-badge ' + getRoleBadgeClass(commission.myRole)">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+            </svg>
+            {{ commission.myRole }}
+          </span>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body">
+          <div class="stats-grid">
+            <!-- Candidats -->
+            <div class="stat-box candidates">
+              <div class="stat-box-header">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <span class="stat-label">Candidats</span>
+              </div>
+              <p class="stat-value">{{ commission.shortlistedCandidatesCount || 0 }}</p>
+              <p class="stat-description">Total présélectionnés</p>
+            </div>
+
+            <!-- Évaluations -->
+            <div class="stat-box evaluations">
+              <div class="stat-box-header">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="stat-label">Évaluations</span>
+              </div>
+              <p class="stat-value">{{ commission.myEvaluationsCount || 0 }}</p>
+              <p class="stat-description">Réalisées par moi</p>
+            </div>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="progress-section">
+            <div class="progress-header">
+              <span class="progress-label">Progression des évaluations</span>
+              <span class="progress-percentage">{{ getProgressPercentage(commission) }}%</span>
+            </div>
+            <div class="progress-bar-container">
+              <div
+                class="progress-bar-fill"
+                [style.width.%]="getProgressPercentage(commission)"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Footer -->
+        <div class="card-footer">
+          <button class="cta-button">
+            <span>Voir les candidatures</span>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="filteredCommissions.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+      <h3 class="empty-title">Aucune commission trouvée</h3>
+      <p class="empty-description">Essayez de modifier vos critères de recherche</p>
+    </div>
+  </div>
+

@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -194,13 +196,23 @@ public class CommissionMemberService {
         // Calculer la moyenne des scores de commission
         Object[] averages = evaluationRepository.getAverageScoresByApplicationId(application.getId());
         Double averageScore = null;
-        if (averages[0] != null) {
-            double sum = ((Number) averages[0]).doubleValue() +
-                    ((Number) averages[1]).doubleValue() +
-                    ((Number) averages[2]).doubleValue() +
-                    ((Number) averages[3]).doubleValue() +
-                    ((Number) averages[4]).doubleValue();
-            averageScore = sum / 5.0;
+
+        if (averages != null && averages.length == 5) {
+            double sum = 0.0;
+            int validScores = 0;
+
+            // Parcourir chaque score et vérifier s'il n'est pas null
+            for (Object avg : averages) {
+                if (avg != null) {
+                    sum += ((Number) avg).doubleValue();
+                    validScores++;
+                }
+            }
+
+            // Calculer la moyenne seulement s'il y a au moins un score valide
+            if (validScores > 0) {
+                averageScore = sum / validScores;
+            }
         }
 
         return CommissionApplicationListDTO.builder()
@@ -217,7 +229,6 @@ public class CommissionMemberService {
                 .alreadyEvaluatedByMe(alreadyEvaluated)
                 .build();
     }
-
     private CommissionApplicationDetailDTO mapToDetailDTO(Application application, Long myMemberId) {
         List<Evaluation> evaluations = evaluationRepository.findByApplicationIdWithMembers(application.getId());
 
@@ -229,6 +240,14 @@ public class CommissionMemberService {
 
         // Calculer les moyennes
         EvaluationAverageDTO averages = calculateAverages(application.getId());
+
+        // Gérer le cas où jobOffer pourrait être null
+        Long jobOfferId = null;
+        String jobOfferTitle = null;
+        if (application.getJobOffer() != null) {
+            jobOfferId = application.getJobOffer().getId();
+            jobOfferTitle = application.getJobOffer().getJobTitle();
+        }
 
         return CommissionApplicationDetailDTO.builder()
                 .id(application.getId())
@@ -245,15 +264,14 @@ public class CommissionMemberService {
                 .matchingDiploma(application.getMatchingDiploma())
                 .justificationIA(application.getJustificationIA())
                 .submitDate(application.getSubmitDate())
-                .jobOfferId(application.getJobOffer().getId())
-                .jobOfferTitle(application.getJobOffer().getJobTitle())
+                .jobOfferId(jobOfferId)
+                .jobOfferTitle(jobOfferTitle)
                 .evaluations(evaluationDTOs)
                 .evaluationCount(evaluations.size())
                 .averageScores(averages)
                 .alreadyEvaluatedByMe(alreadyEvaluated)
                 .build();
     }
-
     private EvaluationResponseDTO mapToEvaluationResponseDTO(Evaluation evaluation) {
         double totalScore = (evaluation.getCompetenceScore() +
                 evaluation.getExperienceScore() +
@@ -261,11 +279,24 @@ public class CommissionMemberService {
                 evaluation.getMotivationScore() +
                 evaluation.getSoftSkillsScore()) / 5.0;
 
+        // Gérer le cas où commissionMember pourrait être null
+        Long evaluatorId = null;
+        String evaluatorName = "Inconnu";
+        String evaluatorRole = "UNKNOWN";
+
+        if (evaluation.getCommissionMember() != null) {
+            evaluatorId = evaluation.getCommissionMember().getId();
+            evaluatorName = evaluation.getCommissionMember().getFullName();
+            if (evaluation.getCommissionMember().getRole() != null) {
+                evaluatorRole = evaluation.getCommissionMember().getRole().name();
+            }
+        }
+
         return EvaluationResponseDTO.builder()
                 .id(evaluation.getId())
-                .evaluatorId(evaluation.getCommissionMember().getId())
-                .evaluatorName(evaluation.getCommissionMember().getFullName())
-                .evaluatorRole(evaluation.getCommissionMember().getRole().name())
+                .evaluatorId(evaluatorId)
+                .evaluatorName(evaluatorName)
+                .evaluatorRole(evaluatorRole)
                 .competenceScore(evaluation.getCompetenceScore())
                 .experienceScore(evaluation.getExperienceScore())
                 .diplomaScore(evaluation.getDiplomaScore())
@@ -281,16 +312,34 @@ public class CommissionMemberService {
     private EvaluationAverageDTO calculateAverages(Long applicationId) {
         Object[] averages = evaluationRepository.getAverageScoresByApplicationId(applicationId);
 
-        if (averages[0] == null) {
+        // Vérifier que le tableau existe et a la bonne taille
+        if (averages == null || averages.length != 5) {
             return null;
         }
 
-        Double avgCompetence = ((Number) averages[0]).doubleValue();
-        Double avgExperience = ((Number) averages[1]).doubleValue();
-        Double avgDiploma = ((Number) averages[2]).doubleValue();
-        Double avgMotivation = ((Number) averages[3]).doubleValue();
-        Double avgSoftSkills = ((Number) averages[4]).doubleValue();
-        Double overall = (avgCompetence + avgExperience + avgDiploma + avgMotivation + avgSoftSkills) / 5.0;
+        // Vérifier qu'au moins un score existe
+        boolean hasAnyScore = Arrays.stream(averages).anyMatch(Objects::nonNull);
+        if (!hasAnyScore) {
+            return null;
+        }
+
+        // Convertir chaque score avec vérification null
+        Double avgCompetence = averages[0] != null ? ((Number) averages[0]).doubleValue() : 0.0;
+        Double avgExperience = averages[1] != null ? ((Number) averages[1]).doubleValue() : 0.0;
+        Double avgDiploma = averages[2] != null ? ((Number) averages[2]).doubleValue() : 0.0;
+        Double avgMotivation = averages[3] != null ? ((Number) averages[3]).doubleValue() : 0.0;
+        Double avgSoftSkills = averages[4] != null ? ((Number) averages[4]).doubleValue() : 0.0;
+
+        // Calculer la moyenne globale en ne comptant que les scores non-null
+        double sum = 0.0;
+        int count = 0;
+        for (Object avg : averages) {
+            if (avg != null) {
+                sum += ((Number) avg).doubleValue();
+                count++;
+            }
+        }
+        Double overall = count > 0 ? sum / count : 0.0;
 
         return EvaluationAverageDTO.builder()
                 .averageCompetenceScore(avgCompetence)
@@ -301,7 +350,6 @@ public class CommissionMemberService {
                 .overallAverage(overall)
                 .build();
     }
-
 
 
 

@@ -1,0 +1,214 @@
+<div class="create-offer-container">
+  <!-- Header -->
+  <header class="page-header">
+    <div class="header-content">
+      <div>
+        <h1 class="page-title">Créer une offre d'emploi</h1>
+        <p class="page-subtitle">Remplissez les informations pour publier une nouvelle offre</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-error">
+    <span class="alert-icon">⚠️</span>
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <!-- Form -->
+  <form class="offer-form" (ngSubmit)="onSubmit()">
+    <!-- Section 1: Informations générales -->
+    <section class="form-section">
+      <h2 class="section-title">Informations générales</h2>
+
+      <div class="form-group">
+        <label for="jobTitle" class="form-label required">Titre du poste</label>
+        <input
+          type="text"
+          id="jobTitle"
+          class="form-input"
+          [(ngModel)]="jobOffer.jobTitle"
+          name="jobTitle"
+          placeholder="Ex: Ingénieur Réseaux et Télécoms"
+          (input)="clearFieldError('jobTitle')"
+          [class.error]="formErrors['jobTitle']"
+        />
+        <span *ngIf="formErrors['jobTitle']" class="error-message">
+          {{ formErrors['jobTitle'] }}
+        </span>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="jobType" class="form-label required">Type d'emploi</label>
+          <select
+            id="jobType"
+            class="form-select"
+            [(ngModel)]="jobOffer.jobType"
+            name="jobType"
+          >
+            <option *ngFor="let option of jobTypeOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="typeContrat" class="form-label required">Type de contrat</label>
+          <select
+            id="typeContrat"
+            class="form-select"
+            [(ngModel)]="jobOffer.typeContrat"
+            name="typeContrat"
+          >
+            <option *ngFor="let option of contractTypeOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description" class="form-label required">Description du poste</label>
+        <textarea
+          id="description"
+          class="form-textarea"
+          [(ngModel)]="jobOffer.description"
+          name="description"
+          rows="8"
+          placeholder="Décrivez en détail le poste, les missions, les responsabilités et l'environnement de travail..."
+          (input)="clearFieldError('description')"
+          [class.error]="formErrors['description']"
+        ></textarea>
+        <span class="char-count" [class.low]="jobOffer.description.length < 50">
+          {{ jobOffer.description.length }} caractères (minimum 50)
+        </span>
+        <span *ngIf="formErrors['description']" class="error-message">
+          {{ formErrors['description'] }}
+        </span>
+      </div>
+    </section>
+
+    <!-- Section 2: Exigences du poste -->
+    <section class="form-section">
+      <h2 class="section-title">Exigences du poste</h2>
+
+      <div class="form-group">
+        <label for="requiredSkills" class="form-label required">Compétences requises</label>
+        <div class="skills-input-wrapper">
+          <input
+            type="text"
+            id="requiredSkills"
+            class="form-input"
+            [(ngModel)]="skillInput"
+            name="skillInput"
+            placeholder="Tapez une compétence et appuyez sur Entrée"
+            (keypress)="onSkillKeyPress($event)"
+            [class.error]="formErrors['requiredSkills']"
+          />
+          <button type="button" class="btn-add-skill" (click)="addSkill()">
+            + Ajouter
+          </button>
+        </div>
+
+        <div *ngIf="getSkillsArray().length > 0" class="skills-list">
+          <span *ngFor="let skill of getSkillsArray()" class="skill-tag">
+            {{ skill }}
+            <button type="button" class="remove-skill" (click)="removeSkill(skill)">
+              ×
+            </button>
+          </span>
+        </div>
+        <span *ngIf="formErrors['requiredSkills']" class="error-message">
+          {{ formErrors['requiredSkills'] }}
+        </span>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="niveauEtudeRequis" class="form-label required">Niveau d'étude requis</label>
+          <select
+            id="niveauEtudeRequis"
+            class="form-select"
+            [(ngModel)]="jobOffer.niveauEtudeRequis"
+            name="niveauEtudeRequis"
+            (change)="clearFieldError('niveauEtudeRequis')"
+            [class.error]="formErrors['niveauEtudeRequis']"
+          >
+            <option value="">Sélectionnez un niveau</option>
+            <option *ngFor="let level of educationLevels" [value]="level">
+              {{ level }}
+            </option>
+          </select>
+          <span *ngIf="formErrors['niveauEtudeRequis']" class="error-message">
+            {{ formErrors['niveauEtudeRequis'] }}
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="experienceMin" class="form-label required">Expérience minimale (années)</label>
+          <input
+            type="number"
+            id="experienceMin"
+            class="form-input"
+            [(ngModel)]="jobOffer.experienceMin"
+            name="experienceMin"
+            min="0"
+            max="50"
+            placeholder="0"
+            (input)="clearFieldError('experienceMin')"
+            [class.error]="formErrors['experienceMin']"
+          />
+          <span *ngIf="formErrors['experienceMin']" class="error-message">
+            {{ formErrors['experienceMin'] }}
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Détails & Dates -->
+    <section class="form-section">
+      <h2 class="section-title">Détails & Dates</h2>
+
+      <div class="form-group">
+        <label for="dateLimite" class="form-label required">Date limite de candidature</label>
+        <input
+          type="date"
+          id="dateLimite"
+          class="form-input"
+          [(ngModel)]="jobOffer.dateLimite"
+          name="dateLimite"
+          [min]="getTodayDate()"
+          (change)="clearFieldError('dateLimite')"
+          [class.error]="formErrors['dateLimite']"
+        />
+        <span *ngIf="formErrors['dateLimite']" class="error-message">
+          {{ formErrors['dateLimite'] }}
+        </span>
+      </div>
+    </section>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn-secondary"
+        (click)="cancel()"
+        [disabled]="isSubmitting"
+      >
+        Annuler
+      </button>
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="isSubmitting"
+      >
+        <span *ngIf="!isSubmitting">Créer l'offre</span>
+        <span *ngIf="isSubmitting" class="loading-text">
+          <span class="spinner-small"></span>
+          Création en cours...
+        </span>
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,418 @@
+<div class="container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Chargement des détails...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="errorMessage && !isLoading" class="error-state">
+    <div class="error-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+    </div>
+    <p class="error-message">{{ errorMessage }}</p>
+    <button class="btn-primary" (click)="loadApplicationDetails()">Réessayer</button>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!isLoading && !errorMessage && application" class="content">
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+      <button class="btn-back" (click)="backToApplications()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Retour aux candidatures
+      </button>
+
+      <div class="action-buttons">
+        <button class="btn-icon" (click)="printDocument()" title="Imprimer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+            <rect x="6" y="14" width="12" height="8"></rect>
+          </svg>
+        </button>
+        <button class="btn-icon" (click)="shareApplication()" title="Partager">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
+        </button>
+        <button class="btn-secondary" (click)="editApplication()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+          Modifier
+        </button>
+      </div>
+    </div>
+
+    <!-- Header Section -->
+    <section class="header-card">
+      <div class="header-left">
+        <div class="avatar-container">
+          <div class="avatar">{{ getInitials() }}</div>
+          <div class="avatar-status" [ngClass]="getStatusClass(application.status)"></div>
+        </div>
+
+        <div class="header-info">
+          <h1 class="candidate-name">{{ getFullName() }}</h1>
+          <p class="job-title">{{ application.jobOfferTitle || '—' }}</p>
+          <div class="meta-info">
+            <span class="meta-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+              {{ application.address || '—' }}
+            </span>
+            <span class="meta-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+              {{ application.email || '—' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="status-badge-large" [ngClass]="getStatusClass(application.status)">
+          <span class="status-dot"></span>
+          {{ getStatusLabel(application.status) }}
+        </div>
+
+        <div class="score-circle" [ngClass]="getScoreColor()">
+          <div class="score-value">{{ application.scoreIA || 0 }}</div>
+          <div class="score-label">{{ getScoreLabel() }}</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Matching Overview -->
+    <section class="matching-overview">
+      <div class="matching-card" [ngClass]="getMatchingClass(application.matchingCompetences)">
+        <div class="matching-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+        </div>
+        <div class="matching-content">
+          <div class="matching-label">Compétences</div>
+          <div class="matching-value">{{ application.matchingCompetences || 0 }}%</div>
+          <div class="matching-level">{{ getMatchingLevel(application.matchingCompetences) }}</div>
+        </div>
+        <div class="matching-bar">
+          <div class="matching-fill" [style.width.%]="application.matchingCompetences || 0"></div>
+        </div>
+      </div>
+
+      <div class="matching-card" [ngClass]="getMatchingClass(application.matchingDiploma)">
+        <div class="matching-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+          </svg>
+        </div>
+        <div class="matching-content">
+          <div class="matching-label">Diplôme</div>
+          <div class="matching-value">{{ application.matchingDiploma || 0 }}%</div>
+          <div class="matching-level">{{ getMatchingLevel(application.matchingDiploma) }}</div>
+        </div>
+        <div class="matching-bar">
+          <div class="matching-fill" [style.width.%]="application.matchingDiploma || 0"></div>
+        </div>
+      </div>
+
+      <div class="matching-card" [ngClass]="getMatchingClass(application.matchingExperience)">
+        <div class="matching-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+          </svg>
+        </div>
+        <div class="matching-content">
+          <div class="matching-label">Expérience</div>
+          <div class="matching-value">{{ application.matchingExperience || 0 }}%</div>
+          <div class="matching-level">{{ getMatchingLevel(application.matchingExperience) }}</div>
+        </div>
+        <div class="matching-bar">
+          <div class="matching-fill" [style.width.%]="application.matchingExperience || 0"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Two Column Layout -->
+    <div class="two-column-layout">
+
+      <!-- Left Column -->
+      <div class="left-column">
+
+        <!-- Auto Summary -->
+        <section class="card">
+          <div class="card-header">
+            <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <h2 class="card-title">Résumé automatique</h2>
+          </div>
+          <div class="card-content">
+            <p class="summary-text">{{ generateAutoSummary() }}</p>
+          </div>
+        </section>
+
+        <!-- IA Analysis -->
+        <section class="card" *ngIf="application.justificationIA">
+          <div class="card-header">
+            <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            <h2 class="card-title">Analyse IA</h2>
+            <span class="badge-ia">Score : {{ application.scoreIA || 0 }}%</span>
+          </div>
+          <div class="card-content">
+            <div class="ia-justification">{{ application.justificationIA }}</div>
+            <div class="ia-meta" *ngIf="application.evaluationCount">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 11l3 3L22 4"></path>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+              </svg>
+              {{ application.evaluationCount }} évaluation(s) effectuée(s)
+            </div>
+          </div>
+        </section>
+
+        <!-- Academic Information -->
+        <section class="card">
+          <div class="card-header">
+            <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+              <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+            </svg>
+            <h2 class="card-title">Formation académique</h2>
+          </div>
+          <div class="card-content">
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-label">Diplôme le plus élevé</div>
+                <div class="info-value">{{ application.highestDegree || '—' }}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Domaine / Spécialité</div>
+                <div class="info-value">{{ application.majorField || '—' }}</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Job Offer Info -->
+        <section class="card">
+          <div class="card-header">
+            <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+            <h2 class="card-title">Offre d'emploi concernée</h2>
+          </div>
+          <div class="card-content">
+            <div class="job-offer-info">
+              <div class="job-offer-title" (click)="viewJobOffer()">
+                {{ application.jobOfferTitle || '—' }}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+              </div>
+              <div class="info-grid">
+                <div class="info-item">
+                  <div class="info-label">ID de l'offre</div>
+                  <div class="info-value">#{{ application.jobOfferId || '—' }}</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Date de soumission</div>
+                  <div class="info-value">
+                    {{ formatDate(application.submitDate) }}
+                    <span class="info-relative">{{ getRelativeDate(application.submitDate) }}</span>
+                  </div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Dernière mise à jour</div>
+                  <div class="info-value">
+                    {{ formatDate(application.updateDate) }}
+                    <span class="info-relative">{{ getRelativeDate(application.updateDate) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Right Column -->
+      <div class="right-column">
+
+        <!-- Quick Actions -->
+        <section class="card actions-card">
+          <div class="card-header">
+            <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M12 1v6m0 6v6m5.5-9.5l-11 11m0-11l11 11"></path>
+            </svg>
+            <h2 class="card-title">Actions RH</h2>
+          </div>
+          <div class="card-content">
+            <div class="action-buttons-list">
+              <button class="action-btn primary" (click)="downloadCV()" [disabled]="!application.cvUrl">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Télécharger le CV</span>
+              </button>
+
+              <button class="action-btn secondary" (click)="scheduleInterview()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <span>Programmer un entretien</span>
+              </button>
+
+              <button class="action-btn secondary" (click)="addEvaluation()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+                <span>Ajouter une évaluation</span>
+              </button>
+
+              <div class="action-divider"></div>
+
+              <button class="action-btn success" (click)="acceptApplication()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Accepter la candidature</span>
+              </button>
+
+              <button class="action-btn danger" (click)="rejectApplication()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+                <span>Rejeter la candidature</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Personal Information -->
+        <section class="card">
+          <div class="card-header">
+            <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <h2 class="card-title">Informations personnelles</h2>
+          </div>
+          <div class="card-content">
+            <div class="info-list">
+              <div class="info-row">
+                <span class="info-row-label">Prénom</span>
+                <span class="info-row-value">{{ application.firstName || '—' }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-row-label">Nom</span>
+                <span class="info-row-value">{{ application.lastName || '—' }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-row-label">Email</span>
+                <span class="info-row-value">
+                  <a [href]="'mailto:' + application.email" class="email-link">{{ application.email || '—' }}</a>
+                </span>
+              </div>
+              <div class="info-row">
+                <span class="info-row-label">Adresse</span>
+                <span class="info-row-value">{{ application.address || '—' }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-row-label">ID Candidat</span>
+                <span class="info-row-value">
+                  <span class="badge-id" (click)="viewCandidateProfile()">
+                    #{{ application.candidateId || '—' }}
+                  </span>
+                </span>
+              </div>
+              <div class="info-row">
+                <span class="info-row-label">ID Candidature</span>
+                <span class="info-row-value">
+                  <span class="badge-id">#{{ application.id || '—' }}</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CV Link -->
+        <section class="card" *ngIf="application.cvUrl">
+          <div class="card-header">
+            <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+              <polyline points="13 2 13 9 20 9"></polyline>
+            </svg>
+            <h2 class="card-title">Curriculum Vitae</h2>
+          </div>
+          <div class="card-content">
+            <div class="cv-preview">
+              <div class="cv-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+              </div>
+              <div class="cv-info">
+                <div class="cv-name">CV_{{ application.lastName }}_{{ application.firstName }}.pdf</div>
+                <button class="cv-download-btn" (click)="downloadCV()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  Télécharger
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+  </div>
+</div>

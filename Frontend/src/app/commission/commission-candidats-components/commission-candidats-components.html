@@ -1,0 +1,223 @@
+<div class="header-top">
+  <div class="header-title">
+    <h1>Liste des Candidats</h1>
+    <p>Commission - {{ commissionTitle || 'Chargement...' }}</p>
+  </div>
+  <div class="header-stats">
+    <p>Total candidats</p>
+    <p>{{ candidates.length }}</p>
+  </div>
+</div>
+  <!-- Header -->
+<!--  <div class="header-section">-->
+<!--    <div class="header-content">-->
+<!--      -->
+
+<!--      &lt;!&ndash; Search & Filters &ndash;&gt;-->
+<!--      <div class="search-filter-bar">-->
+<!--        <div class="search-wrapper">-->
+<!--          <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">-->
+<!--            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />-->
+<!--          </svg>-->
+<!--          <input-->
+<!--            type="text"-->
+<!--            class="search-input"-->
+<!--            placeholder="Rechercher par nom, diplôme ou spécialisation..."-->
+<!--            [(ngModel)]="searchTerm"-->
+<!--            (ngModelChange)="applyFilters()"-->
+<!--          />-->
+<!--        </div>-->
+
+<!--        <select-->
+<!--          class="filter-select"-->
+<!--          [(ngModel)]="statusFilter"-->
+<!--          (ngModelChange)="applyFilters()"-->
+<!--        >-->
+<!--          <option value="all">Tous les statuts</option>-->
+<!--          <option value="evaluated">Évalués par moi</option>-->
+<!--          <option value="pending">Non évalués</option>-->
+<!--        </select>-->
+
+<!--        <select-->
+<!--          class="filter-select"-->
+<!--          [(ngModel)]="sortBy"-->
+<!--          (ngModelChange)="applySorting()"-->
+<!--        >-->
+<!--          <option value="scoreIA">Score IA</option>-->
+<!--          <option value="avgScore">Score moyen</option>-->
+<!--          <option value="date">Date de dépôt</option>-->
+<!--        </select>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p class="loading-text">Chargement des candidats...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-container">
+    <div class="error-message">{{ error }}</div>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!isLoading && !error" class="main-content">
+    <div class="results-info">
+      <p>
+        <span>{{ filteredCandidates.length }}</span> candidat(s) affiché(s)
+      </p>
+    </div>
+
+    <!-- Candidates List -->
+    <div class="candidates-list">
+      <div
+        *ngFor="let candidate of filteredCandidates"
+        class="candidate-card"
+      >
+        <div class="card-content">
+          <div class="card-layout">
+            <!-- Left Section - Avatar & Basic Info -->
+            <div class="section-left">
+              <!-- Avatar -->
+              <div class="avatar">
+                {{ getInitials(candidate.candidateName) }}
+              </div>
+
+              <!-- Name & Contact -->
+              <div class="basic-info">
+                <h3 class="candidate-name">{{ candidate.candidateName }}</h3>
+                <p class="candidate-email">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <span>{{ candidate.candidateEmail }}</span>
+                </p>
+                <div class="status-badges">
+                  <span [class]="'status-badge ' + getEvaluationStatusClass(candidate)">
+                    <svg *ngIf="candidate.alreadyEvaluatedByMe" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <svg *ngIf="candidate.evaluationCount && !candidate.alreadyEvaluatedByMe && candidate.evaluationCount > 0" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <svg *ngIf="!candidate.alreadyEvaluatedByMe && candidate.evaluationCount === 0" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {{ getEvaluationStatusLabel(candidate) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Middle Section - Academic Info -->
+            <div class="section-middle">
+              <div class="info-block">
+                <p class="info-label">Diplôme</p>
+                <p class="info-value">{{ candidate.highestDegree || 'Non renseigné' }}</p>
+              </div>
+              <div class="info-block">
+                <p class="info-label">Spécialisation</p>
+                <p class="info-value">{{ candidate.specialization || 'Non renseignée' }}</p>
+              </div>
+              <div class="info-date">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span>Déposé le {{ formatDate(candidate.submitDate) }}</span>
+              </div>
+            </div>
+
+            <!-- Right Section - Scores & Actions -->
+            <div class="section-right">
+              <!-- Scores Grid -->
+              <div class="scores-grid">
+                <div class="score-box score-ia">
+                  <div class="score-header">
+                    <span class="score-label">Score IA</span>
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                    </svg>
+                  </div>
+                  <p class="score-value">{{ candidate.scoreIA || '--' }}</p>
+                </div>
+
+                <div class="score-box score-commission">
+                  <div class="score-header">
+                    <span class="score-label">Moy. Com.</span>
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </div>
+                  <p class="score-value">{{ candidate.averageCommissionScore || '--' }}</p>
+                  <p class="score-detail">{{ candidate.evaluationCount || 0 }} éval.</p>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="action-buttons">
+                <button class="btn-primary" (click)="viewCandidate(candidate.id)">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  <span>Voir dossier</span>
+                </button>
+                <button class="btn-icon" (click)="openComments(candidate.id)">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                </button>
+                <button *ngIf="!candidate.alreadyEvaluatedByMe" class="btn-icon btn-success" (click)="sendConvocation(candidate.id)">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions Footer -->
+        <div class="card-footer">
+          <a [href]="candidate.cvUrl" class="footer-link" target="_blank">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Télécharger CV
+          </a>
+          <button
+            *ngIf="candidate.alreadyEvaluatedByMe"
+            class="footer-status"
+          >
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Évaluation complétée
+          </button>
+          <button
+            *ngIf="!candidate.alreadyEvaluatedByMe"
+            class="footer-action"
+            (click)="evaluateCandidate(candidate.id)"
+          >
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+            </svg>
+            Évaluer maintenant
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="filteredCandidates.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+      <h3 class="empty-title">Aucun candidat trouvé</h3>
+      <p class="empty-description">Essayez de modifier vos filtres de recherche</p>
+    </div>
+  </div>

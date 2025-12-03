@@ -1,0 +1,376 @@
+
+  <div class="stepper-header">
+    <div class="stepper-container">
+      <div
+        *ngFor="let step of steps; let i = index"
+        class="stepper-item"
+        [class.active]="currentStep === step.number"
+        [class.completed]="isStepCompleted(step.number)"
+        (click)="navigateToStep(step.number)"
+      >
+        <!-- Cercle avec numéro ou check -->
+        <div class="stepper-circle">
+          <span *ngIf="!isStepCompleted(step.number)" class="stepper-number">{{ step.number }}</span>
+          <svg *ngIf="isStepCompleted(step.number)" class="stepper-check" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8L6.5 11.5L13 5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <!-- Label de l'étape -->
+        <div class="stepper-label">
+          <span class="stepper-title">{{ step.title }}</span>
+          <span class="stepper-subtitle">{{ step.subtitle }}</span>
+        </div>
+
+        <!-- Ligne de connexion -->
+        <div *ngIf="i < steps.length - 1" class="stepper-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress Bar (existante - conservée) -->
+<!--  <div class="progress-section">-->
+<!--    <div class="step-label">Step {{ currentStep }} of {{ totalSteps }}</div>-->
+<!--    <div class="progress-bar">-->
+<!--      <div class="progress-fill" [style.width.%]="progressPercentage"></div>-->
+<!--    </div>-->
+<!--  </div>-->
+  <div class="form-container">
+    <!-- Étape 1 : Informations personnelles -->
+    <form *ngIf="currentStep === 1" [formGroup]="step1Form" class="step-content">
+      <div class="form-row">
+        <div class="form-field">
+          <label class="field-label">Nom</label>
+          <input
+            type="text"
+            formControlName="lastName"
+            placeholder="Entrez votre nom"
+            class="form-input"
+            [class.error]="isFieldInvalid(step1Form, 'lastName')"
+          />
+        </div>
+
+        <div class="form-field">
+          <label class="field-label">Prénom</label>
+          <input
+            type="text"
+            formControlName="firstName"
+            placeholder="Entrez votre prénom"
+            class="form-input"
+            [class.error]="isFieldInvalid(step1Form, 'firstName')"
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label class="field-label">Email</label>
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="Entrez votre email"
+            class="form-input"
+            [class.error]="isFieldInvalid(step1Form, 'email')"
+          />
+        </div>
+
+        <div class="form-field">
+          <label class="field-label">Numéro de téléphone</label>
+          <input
+            type="tel"
+            formControlName="phoneNumber"
+            placeholder="Entrez votre numéro de téléphone"
+            class="form-input"
+            [class.error]="isFieldInvalid(step1Form, 'phoneNumber')"
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label class="field-label">Adresse</label>
+          <input
+            type="text"
+            formControlName="address"
+            placeholder="Entrez votre adresse"
+            class="form-input"
+            [class.error]="isFieldInvalid(step1Form, 'address')"
+          />
+        </div>
+
+        <div class="form-field">
+          <label class="field-label">Nationalité</label>
+          <input
+            type="text"
+            formControlName="nationality"
+            placeholder="Entrez votre nationalité"
+            class="form-input"
+            [class.error]="isFieldInvalid(step1Form, 'nationality')"
+          />
+        </div>
+      </div>
+    </form>
+
+    <!-- Étape 2 : Parcours académique -->
+    <form *ngIf="currentStep === 2" [formGroup]="step2Form" class="step-content">
+      <div class="form-row">
+        <div class="form-field-full">
+          <label class="field-label">Diplôme le plus élevé obtenu</label>
+          <select formControlName="highestDegree" class="form-select">
+            <option value="">Sélectionner</option>
+            <option *ngFor="let degree of degreeOptions" [value]="degree">{{ degree }}</option>
+          </select>
+        </div>
+
+        <div class="form-field-full">
+          <label class="field-label">Domaine d'études / Spécialité</label>
+          <input
+            type="text"
+            formControlName="majorField"
+            placeholder="ex: Informatique"
+            class="form-input"
+          />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field-full">
+          <label class="field-label">Établissement d'enseignement</label>
+          <input
+            type="text"
+            formControlName="educationalInstitution"
+            placeholder="ex: Université de Dakar"
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-field-full">
+          <label class="field-label">Année d'obtention du diplôme</label>
+          <select formControlName="yearOfGraduation" class="form-select">
+            <option value="">Sélectionner</option>
+            <option *ngFor="let year of yearOptions" [value]="year">{{ year }}</option>
+          </select>
+        </div>
+      </div>
+    </form>
+
+    <!-- Étape 3 : Téléchargement de documents -->
+    <div *ngIf="currentStep === 3" class="step-content upload-container">
+      <!-- Zone de dépôt -->
+      <div
+        class="drop-zone"
+        [class.dragging]="isDragging"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+      >
+        <div class="drop-zone-content">
+          <div class="cloud-icon">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+              <circle cx="24" cy="24" r="24" fill="#E3F2FD"/>
+              <path d="M24 16V28M24 28L28 24M24 28L20 24" stroke="#2196F3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M16 26C16 26 14 26 14 24C14 22 16 22 16 22C16 19 18 16 22 16C24 16 25.5 17 26.5 18.5C27 18 28 18 29 18C31 18 33 20 33 22C33 22 35 22 35 24C35 26 33 26 33 26" stroke="#2196F3" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+
+          <h2 class="drop-zone-title">Glissez-déposez vos fichiers ici</h2>
+          <p class="drop-zone-subtitle">Types de fichiers autorisés : PDF, DOCX, PNG. Taille max. : 5 Mo</p>
+
+          <label class="browse-button">
+            Parcourir les fichiers
+            <input
+              type="file"
+              multiple
+              accept=".pdf,.docx,.png"
+              (change)="onFileSelect($event)"
+              style="display: none;"
+            />
+          </label>
+        </div>
+      </div>
+
+      <!-- Liste des fichiers -->
+      <div class="files-list" *ngIf="files.length > 0">
+        <div
+          *ngFor="let fileUpload of files"
+          class="file-item"
+          [class.error]="fileUpload.status === 'error'"
+          [class.completed]="fileUpload.status === 'completed'"
+        >
+          <div class="file-icon">
+            <svg *ngIf="fileUpload.file.name.endsWith('.pdf')" width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <rect x="4" y="2" width="16" height="20" rx="2" fill="#666"/>
+              <text x="12" y="14" text-anchor="middle" fill="white" font-size="8" font-weight="bold">PDF</text>
+            </svg>
+
+            <svg *ngIf="fileUpload.file.name.endsWith('.docx')" width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <rect x="4" y="2" width="16" height="20" rx="2" fill="#2B579A"/>
+              <text x="12" y="14" text-anchor="middle" fill="white" font-size="7" font-weight="bold">DOC</text>
+            </svg>
+
+            <svg *ngIf="fileUpload.file.name.endsWith('.png')" width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="3" width="18" height="18" rx="2" fill="#4CAF50"/>
+              <circle cx="9" cy="9" r="2" fill="white"/>
+              <path d="M3 17L8 12L12 16L17 11L21 15V19C21 20.1 20.1 21 19 21H5C3.9 21 3 20.1 3 19V17Z" fill="white"/>
+            </svg>
+
+            <svg *ngIf="fileUpload.status === 'error'" width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <rect x="4" y="2" width="16" height="20" rx="2" fill="#DC3545"/>
+              <path d="M12 8V12M12 16H12.01" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+
+          <div class="file-info">
+            <div class="file-name">{{ fileUpload.file.name }}</div>
+            <div class="file-details">
+          <span *ngIf="fileUpload.status === 'error'" class="error-message">
+            {{ fileUpload.errorMessage }}
+          </span>
+              <span *ngIf="fileUpload.status !== 'error'">
+            {{ formatFileSize(fileUpload.file.size) }}
+          </span>
+            </div>
+          </div>
+
+          <div class="file-status">
+            <!-- Barre de progression -->
+            <div *ngIf="fileUpload.status === 'uploading'" class="progress-container">
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="fileUpload.progress"></div>
+              </div>
+              <span class="progress-text">{{ fileUpload.progress }}%</span>
+            </div>
+
+            <!-- Terminé -->
+            <div *ngIf="fileUpload.status === 'completed'" class="status-completed">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <circle cx="10" cy="10" r="10" fill="#28A745"/>
+                <path d="M6 10L8.5 12.5L14 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span class="status-text">Terminé</span>
+            </div>
+          </div>
+
+          <button class="delete-button" (click)="removeFile(fileUpload.id)">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M5 7H15M8 10V14M12 10V14M6 7L7 16C7 16.5 7.5 17 8 17H12C12.5 17 13 16.5 13 16L14 7M9 7V5C9 4.5 9.5 4 10 4H10C10.5 4 11 4.5 11 5V7" stroke="#666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Étape 4 : Motivation -->
+    <form *ngIf="currentStep === 4" [formGroup]="step4Form" class="step-content">
+      <div class="form-field-full">
+        <label class="field-label">Pourquoi souhaitez-vous rejoindre l'École Polytechnique de Thiès ?</label>
+        <textarea
+          formControlName="motivationEcole"
+          rows="6"
+          class="form-textarea"
+        ></textarea>
+      </div>
+
+      <div class="form-field-full">
+        <label class="field-label">Qu'est-ce qui vous motive à postuler pour ce poste ?</label>
+        <textarea
+          formControlName="motivationPosition"
+          rows="6"
+          class="form-textarea"
+        ></textarea>
+      </div>
+
+      <div class="radio-group">
+        <label class="radio-option" [class.selected]="step4Form.get('availableImmediately')?.value === true">
+          <input
+            type="radio"
+            formControlName="availableImmediately"
+            [value]="true"
+            class="radio-input"
+          />
+          <div class="radio-content">
+            <div class="radio-title">Oui</div>
+            <div class="radio-subtitle">Je suis disponible immédiatement</div>
+          </div>
+        </label>
+
+        <label class="radio-option" [class.selected]="step4Form.get('availableImmediately')?.value === false">
+          <input
+            type="radio"
+            formControlName="availableImmediately"
+            [value]="false"
+            class="radio-input"
+          />
+          <div class="radio-content">
+            <div class="radio-title">Non</div>
+            <div class="radio-subtitle">Je ne suis pas disponible immédiatement</div>
+          </div>
+        </label>
+      </div>
+    </form>
+
+    <!-- Étape 5 : Confirmation -->
+    <form *ngIf="currentStep === 5" [formGroup]="step5Form" class="step-content">
+      <label class="checkbox-label">
+        <input
+          type="checkbox"
+          formControlName="certifyAccurate"
+          class="checkbox-input"
+        />
+        <span class="checkbox-text">
+        Je certifie que les informations fournies dans cette candidature sont exactes et complètes à ma connaissance.
+      </span>
+      </label>
+
+      <label class="checkbox-label">
+        <input
+          type="checkbox"
+          formControlName="consentGDPR"
+          class="checkbox-input"
+        />
+        <span class="checkbox-text">
+        Je consens au traitement de mes données personnelles par l'École Polytechnique de Thiès conformément au Règlement Général sur la Protection des Données (RGPD).
+      </span>
+      </label>
+
+      <div class="form-field-full signature-field">
+        <label class="field-label">Signature électronique</label>
+        <input
+          type="text"
+          formControlName="electronicSignature"
+          placeholder="Tapez votre nom complet"
+          class="form-input signature-input"
+        />
+      </div>
+    </form>
+
+    <!-- Boutons de navigation -->
+    <div class="form-actions">
+      <button
+        *ngIf="currentStep > 1"
+        type="button"
+        class="multi-step-btn multi-step-btn-secondary"
+        (click)="previousStep()"
+      >
+        Précédent
+      </button>
+
+      <button
+        *ngIf="currentStep < totalSteps"
+        type="button"
+        class="multi-step-btn multi-step-btn-primary"
+        (click)="nextStep()"
+      >
+        Suivant
+      </button>
+
+      <button
+        *ngIf="currentStep === totalSteps"
+        type="button"
+        class="multi-step-btn multi-step-btn-primary"
+        (click)="submitApplication()"
+        [disabled]="!step5Form.valid"
+      >
+        Soumettre la candidature
+      </button>
+    </div>
+  </div>

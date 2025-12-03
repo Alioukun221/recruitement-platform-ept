@@ -1,0 +1,100 @@
+<div class="create-commission-container">
+  <!-- Header -->
+  <header class="page-header">
+    <div class="header-content">
+      <div>
+        <h1 class="page-title">Créer une commission</h1>
+        <p class="page-subtitle">Remplissez les informations pour créer une nouvelle commission</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-error">
+    <span class="alert-icon">⚠️</span>
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <!-- Form -->
+  <form class="commission-form" (ngSubmit)="onSubmit()">
+    <!-- Section 1: Informations générales -->
+    <section class="form-section">
+      <h2 class="section-title">Informations générales</h2>
+
+      <div class="form-group">
+        <label for="name" class="form-label required">Nom de la commission</label>
+        <input
+          type="text"
+          id="name"
+          class="form-input"
+          [(ngModel)]="commission.name"
+          name="name"
+          placeholder="Ex: Commission de recrutement - Ingénieur Réseaux"
+          (input)="clearFieldError('name')"
+          [class.error]="formErrors['name']"
+        />
+        <span *ngIf="formErrors['name']" class="error-message">
+          {{ formErrors['name'] }}
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="jobOfferId" class="form-label required">Offre d'emploi associée</label>
+        <select
+          id="jobOfferId"
+          class="form-select"
+          [(ngModel)]="commission.jobOfferId"
+          name="jobOfferId"
+          (change)="clearFieldError('jobOfferId')"
+          [class.error]="formErrors['jobOfferId']"
+        >
+          <option value="">Sélectionnez une offre d'emploi</option>
+          <option *ngFor="let offer of jobOffers" [value]="offer.id">
+            {{ offer.jobTitle }}
+          </option>
+        </select>
+        <span *ngIf="formErrors['jobOfferId']" class="error-message">
+          {{ formErrors['jobOfferId'] }}
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="description" class="form-label">Description</label>
+        <textarea
+          id="description"
+          class="form-textarea"
+          [(ngModel)]="commission.description"
+          name="description"
+          rows="6"
+          placeholder="Décrivez les objectifs et le rôle de cette commission..."
+        ></textarea>
+        <span class="char-count">
+          {{ commission.description?.length || 0 }} caractères
+        </span>
+      </div>
+    </section>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn-secondary"
+        (click)="cancel()"
+        [disabled]="isSubmitting"
+      >
+        Annuler
+      </button>
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="isSubmitting"
+      >
+        <span *ngIf="!isSubmitting">Créer la commission</span>
+        <span *ngIf="isSubmitting" class="loading-text">
+          <span class="spinner-small"></span>
+          Création en cours...
+        </span>
+      </button>
+    </div>
+  </form>
+</div>

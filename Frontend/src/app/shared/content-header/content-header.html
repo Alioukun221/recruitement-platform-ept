@@ -1,0 +1,13 @@
+<div class="content-header">
+  <h1 class="page-title">{{ title }}</h1>
+  <div class="breadcrumb">
+    <ng-container *ngFor="let item of breadcrumb; let last = last">
+      <span class="breadcrumb-item" [ngClass]="{'breadcrumb-active': last}">
+        {{ item }}
+      </span>
+      <svg *ngIf="!last" class="breadcrumb-separator" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </ng-container>
+  </div>
+</div>

@@ -1,0 +1,486 @@
+<div class="dashboard-container">
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner"></div>
+    <p>Chargement du tableau de bord...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="errorMessage && !isLoading" class="error-state">
+    <div class="error-icon">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+    </div>
+    <h3>Erreur de chargement</h3>
+    <p>{{ errorMessage }}</p>
+    <button class="btn-retry" (click)="loadDashboard()">Réessayer</button>
+  </div>
+
+  <!-- Main Dashboard -->
+  <div *ngIf="!isLoading" class="dashboard-content">
+
+    <!-- Header -->
+    <header class="dashboard-header">
+      <div class="header-content">
+        <div class="header-left">
+          <h1 class="dashboard-title">Tableau de bord RH</h1>
+          <p class="dashboard-subtitle">Vue d'ensemble de vos activités de recrutement</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn-secondary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            <span>Exporter</span>
+          </button>
+          <button class="btn-primary" (click)="loadDashboard()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <polyline points="23 4 23 10 17 10"/>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+            </svg>
+            <span>Actualiser</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Alerts Section -->
+    <section class="alerts-section" *ngIf="alerts && alerts.length > 0">
+      <div class="alerts-grid">
+        <div *ngFor="let alert of alerts" class="alert-card" [ngClass]="getAlertClass(alert.alertType)">
+          <div class="alert-icon">
+            <svg *ngIf="alert.alertType === 'ERROR'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="15" y1="9" x2="9" y2="15"/>
+              <line x1="9" y1="9" x2="15" y2="15"/>
+            </svg>
+            <svg *ngIf="alert.alertType === 'WARNING'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <svg *ngIf="alert.alertType === 'INFO'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+            <svg *ngIf="alert.alertType === 'SUCCESS'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div class="alert-content">
+            <h4 class="alert-title">{{ alert.title }}</h4>
+            <p class="alert-message">{{ alert.message }}</p>
+            <a *ngIf="alert.actionUrl" [href]="alert.actionUrl" class="alert-action">
+              Voir détails
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+              </svg>
+            </a>
+          </div>
+          <span *ngIf="alert.count" class="alert-badge">{{ alert.count }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Overview Cards -->
+    <section class="overview-section">
+      <div class="overview-grid">
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon-wrapper blue">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+              </svg>
+            </div>
+            <span class="stat-trend positive">+12%</span>
+          </div>
+          <div class="stat-content">
+            <p class="stat-label">Offres actives</p>
+            <h3 class="stat-value">{{ overview.totalActiveJobOffers || 0 }}</h3>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon-wrapper purple">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+            </div>
+            <span class="stat-trend positive">+{{ applicationStats.growthRate || 0 }}%</span>
+          </div>
+          <div class="stat-content">
+            <p class="stat-label">Candidatures totales</p>
+            <h3 class="stat-value">{{ overview.totalApplications || 0 }}</h3>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon-wrapper green">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <span class="stat-trend neutral">En cours</span>
+          </div>
+          <div class="stat-content">
+            <p class="stat-label">Candidats présélectionnés</p>
+            <h3 class="stat-value">{{ overview.candidatesShortlisted || 0 }}</h3>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon-wrapper orange">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <span class="stat-trend warning">À traiter</span>
+          </div>
+          <div class="stat-content">
+            <p class="stat-label">Évaluations en attente</p>
+            <h3 class="stat-value">{{ overview.pendingEvaluations || 0 }}</h3>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content Grid -->
+    <div class="main-grid">
+
+      <!-- Left Column -->
+      <div class="left-column">
+
+        <!-- Application Trend Chart -->
+        <section class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <h2 class="card-title">Évolution des candidatures</h2>
+              <p class="card-subtitle">30 derniers jours</p>
+            </div>
+            <div class="card-header-actions">
+              <button class="btn-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                  <circle cx="12" cy="12" r="1"/>
+                  <circle cx="12" cy="5" r="1"/>
+                  <circle cx="12" cy="19" r="1"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="chart-wrapper">
+              <apx-chart
+                #lineChart
+                [series]="lineChartOptions.series!"
+                [chart]="lineChartOptions.chart!"
+                [xaxis]="lineChartOptions.xaxis!"
+                [stroke]="lineChartOptions.stroke!"
+                [colors]="lineChartOptions.colors!"
+                [dataLabels]="lineChartOptions.dataLabels!"
+                [legend]="lineChartOptions.legend!"
+                [grid]="lineChartOptions.grid!"
+                [tooltip]="lineChartOptions.tooltip!"
+              ></apx-chart>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="quick-stats">
+              <div class="quick-stat-item">
+                <span class="quick-stat-label">Total</span>
+                <span class="quick-stat-value">{{ applicationStats.totalApplications || 0 }}</span>
+              </div>
+              <div class="quick-stat-item">
+                <span class="quick-stat-label">Score IA moyen</span>
+                <span class="quick-stat-value">{{ applicationStats.averageIAScore || 0 }}%</span>
+              </div>
+              <div class="quick-stat-item">
+                <span class="quick-stat-label">Taux présélection</span>
+                <span class="quick-stat-value">
+                  {{ calculatePercentage(applicationStats.shortlistedApplications || 0, applicationStats.totalApplications || 1) }}%
+                </span>
+              </div>
+              <div class="quick-stat-item">
+                <span class="quick-stat-label">Croissance</span>
+                <span class="quick-stat-value positive">+{{ applicationStats.growthRate || 0 }}%</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Education Distribution Chart -->
+        <section class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <h2 class="card-title">Répartition par niveau d'études</h2>
+              <p class="card-subtitle">Distribution des candidats</p>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="chart-wrapper">
+              <apx-chart
+                [series]="donutChartOptions.series!"
+                [chart]="donutChartOptions.chart!"
+                [labels]="donutChartOptions.labels!"
+                [colors]="donutChartOptions.colors!"
+                [legend]="donutChartOptions.legend!"
+                [dataLabels]="donutChartOptions.dataLabels!"
+                [plotOptions]="donutChartOptions.plotOptions!"
+                [tooltip]="donutChartOptions.tooltip!"
+              ></apx-chart>
+            </div>
+          </div>
+        </section>
+
+        <!-- Job Offers Statistics -->
+        <section class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <h2 class="card-title">Offres d'emploi</h2>
+              <p class="card-subtitle">Vue globale</p>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="job-stats-grid">
+              <div class="job-stat-card published">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                <div class="job-stat-content">
+                  <span class="job-stat-value">{{ jobOfferStats.publishedJobOffers || 0 }}</span>
+                  <span class="job-stat-label">Publiées</span>
+                </div>
+              </div>
+
+              <div class="job-stat-card draft">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+                <div class="job-stat-content">
+                  <span class="job-stat-value">{{ jobOfferStats.draftJobOffers || 0 }}</span>
+                  <span class="job-stat-label">Brouillons</span>
+                </div>
+              </div>
+
+              <div class="job-stat-card closed">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                <div class="job-stat-content">
+                  <span class="job-stat-value">{{ jobOfferStats.closedJobOffers || 0 }}</span>
+                  <span class="job-stat-label">Fermées</span>
+                </div>
+              </div>
+
+              <div class="job-stat-card archived">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                  <polyline points="21 8 21 21 3 21 3 8"/>
+                  <rect x="1" y="3" width="22" height="5"/>
+                  <line x1="10" y1="12" x2="14" y2="12"/>
+                </svg>
+                <div class="job-stat-content">
+                  <span class="job-stat-value">{{ jobOfferStats.archivedJobOffers || 0 }}</span>
+                  <span class="job-stat-label">Archivées</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contract & Job Types -->
+            <div class="distribution-section" *ngIf="contractTypeData.length > 0">
+              <h4 class="section-subtitle">Par type de contrat</h4>
+              <div class="tags-container">
+                <div *ngFor="let contract of contractTypeData" class="tag">
+                  <span class="tag-label">{{ contract.label }}</span>
+                  <span class="tag-count">{{ contract.value }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="distribution-section" *ngIf="jobTypeData.length > 0">
+              <h4 class="section-subtitle">Par type d'emploi</h4>
+              <div class="tags-container">
+                <div *ngFor="let type of jobTypeData" class="tag tag-secondary">
+                  <span class="tag-label">{{ type.label }}</span>
+                  <span class="tag-count">{{ type.value }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="info-banner" *ngIf="jobOfferStats.jobOffersExpiringSoon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="16" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12.01" y2="8"/>
+              </svg>
+              <span><strong>{{ jobOfferStats.jobOffersExpiringSoon }}</strong> offre(s) expirent bientôt</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Right Column -->
+      <div class="right-column">
+
+        <!-- Top Job Offers -->
+        <section class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <h2 class="card-title">Top offres</h2>
+            </div>
+            <button class="btn-text">Voir tout</button>
+          </div>
+          <div class="card-content">
+            <div class="job-offers-list">
+              <div *ngFor="let offer of topJobOffers" class="job-offer-item">
+                <div class="job-offer-header">
+                  <h4 class="job-offer-title">{{ offer.jobTitle }}</h4>
+                  <span class="job-badge" [ngClass]="getStatusBadgeClass(offer.status)">
+                    {{ offer.status }}
+                  </span>
+                </div>
+                <div class="job-offer-metrics">
+                  <div class="metric">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                      <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                    <span>{{ offer.totalApplications }}</span>
+                  </div>
+                  <div class="metric">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <span>{{ offer.shortlistedCount }}</span>
+                  </div>
+                  <div class="metric">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                    <span>{{ offer.averageIAScore || 0 }}%</span>
+                  </div>
+                  <div class="metric">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                      <line x1="16" y1="2" x2="16" y2="6"/>
+                      <line x1="8" y1="2" x2="8" y2="6"/>
+                      <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    <span>{{ offer.daysActive }}j</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Commission Statistics -->
+        <section class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <h2 class="card-title">Commissions</h2>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="commission-stats">
+              <div class="commission-stat">
+                <span class="commission-label">Total</span>
+                <span class="commission-value">{{ commissionStats.totalCommissions || 0 }}</span>
+              </div>
+              <div class="commission-stat highlight">
+                <span class="commission-label">Actives</span>
+                <span class="commission-value">{{ commissionStats.activeCommissions || 0 }}</span>
+              </div>
+              <div class="commission-stat">
+                <span class="commission-label">Membres</span>
+                <span class="commission-value">{{ commissionStats.totalCommissionMembers || 0 }}</span>
+              </div>
+              <div class="commission-stat">
+                <span class="commission-label">Évaluations</span>
+                <span class="commission-value">{{ commissionStats.totalEvaluations || 0 }}</span>
+              </div>
+            </div>
+
+            <div class="progress-section">
+              <div class="progress-header">
+                <span class="progress-label">Taux de complétion</span>
+                <span class="progress-percentage">{{ commissionStats.evaluationCompletionRate || 0 }}%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="commissionStats.evaluationCompletionRate || 0"></div>
+              </div>
+            </div>
+
+            <div class="featured-card" *ngIf="commissionStats.mostActiveCommission">
+              <div class="featured-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+                <span>Plus active</span>
+              </div>
+              <h4 class="featured-title">{{ commissionStats.mostActiveCommission.commissionName }}</h4>
+              <p class="featured-subtitle">{{ commissionStats.mostActiveCommission.jobOfferTitle }}</p>
+              <div class="featured-metrics">
+                <span>{{ commissionStats.mostActiveCommission.membersCount }} membres</span>
+                <span class="divider">•</span>
+                <span>{{ commissionStats.mostActiveCommission.evaluationsCount }} évaluations</span>
+                <span class="divider">•</span>
+                <span>{{ commissionStats.mostActiveCommission.candidatesCount }} candidats</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Recent Activities -->
+        <section class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <h2 class="card-title">Activités récentes</h2>
+            </div>
+            <button class="btn-text">Voir tout</button>
+          </div>
+          <div class="card-content">
+            <div class="activity-list">
+              <div *ngFor="let activity of recentActivities" class="activity-item">
+                <div class="activity-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                </div>
+                <div class="activity-content">
+                  <p class="activity-description">{{ activity.description }}</p>
+                  <div class="activity-meta">
+                    <span class="activity-entity" *ngIf="activity.relatedEntity">{{ activity.relatedEntity }}</span>
+                    <span class="activity-time">{{ formatDate(activity.timestamp) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+  </div>
+</div>

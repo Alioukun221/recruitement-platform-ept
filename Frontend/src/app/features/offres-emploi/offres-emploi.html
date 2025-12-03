@@ -1,0 +1,78 @@
+<app-content-header
+  [title]="'Offres d\'emploi'"
+  [breadcrumb]="['Offres d\'emploi', 'Tous']">
+</app-content-header>
+
+<div class="jobs-grid">
+  <div *ngFor="let job of jobOffers" (click)="goToCandidater(job.id)" class="job-card">
+    <div class="job-header">
+      <div class="job-logo">
+        <span>L</span>
+      </div>
+      <div class="job-title-container">
+        <p class="job-company">{{ job.jobType }}</p>
+        <h3 class="job-title">{{ job.jobTitle }}</h3>
+      </div>
+    </div>
+
+    <div class="job-section">
+      <h4 class="section-title">Aperçu du poste</h4>
+      <p class="job-description">{{ job.description }}</p>
+    </div>
+
+    <div class="job-section">
+      <h4 class="section-title">Compétences</h4>
+      <div class="skills-list">
+        <span *ngFor="let skill of job.skills" class="skill-tag">{{ skill }}</span>
+      </div>
+    </div>
+
+    <div class="job-section">
+      <h4 class="section-title">Détails</h4>
+      <div class="details-grid">
+        <div class="detail-item">
+          <p class="detail-value">{{ job.dateLimite }}</p>
+          <div class="detail-badge">
+            <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>Date Limite</span>
+          </div>
+        </div>
+        <div class="detail-item">
+          <p class="detail-value">{{ job.totalSpent }}</p>
+          <div class="detail-badge">
+            <div class="badge-dot"></div>
+            <span>Type de contract</span>
+          </div>
+        </div>
+        <div class="detail-item">
+          <p class="detail-value">{{ job.experienceMin }}</p>
+          <div class="detail-badge">
+            <div class="badge-dot"></div>
+            <span>Experience Minimum</span>
+          </div>
+        </div>
+        <div class="detail-item">
+          <p class="detail-value">{{ job.niveauEtudeRequis }}</p>
+          <div class="detail-badge">
+            <div class="badge-dot"></div>
+            <span>Niveau d'etude requise</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="job-actions">
+      <button class="btn-secondary">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        Télécharger le PDF
+      </button>
+      <button class="btn-primary">Candidater</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,303 @@
+<!--<div class="candidate-detail-container">-->
+  <!-- Header avec retour -->
+  <div class="page-header">
+    <button class="back-button" (click)="goBack()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Retour à la liste
+    </button>
+    <h1 class="page-title">Détails du candidat</h1>
+  </div>
+
+  <!-- Chargement -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Chargement des informations...</p>
+  </div>
+
+  <!-- Erreur -->
+  <div *ngIf="error" class="error-state">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Contenu principal -->
+  <div *ngIf="candidate && !loading" class="content-wrapper">
+
+    <!-- Section Informations personnelles -->
+    <div class="card profile-card">
+      <div class="profile-header">
+        <div class="avatar">
+          {{ getInitials() }}
+        </div>
+        <div class="profile-info">
+          <h2 class="candidate-name">{{ candidate.firstName }} {{ candidate.lastName }}</h2>
+          <p class="candidate-specialization" *ngIf="candidate.specialization">{{ candidate.specialization }}</p>
+          <p class="candidate-degree" *ngIf="candidate.highestDegree">{{ candidate.highestDegree }}</p>
+        </div>
+        <div class="profile-actions">
+          <button class="btn-icon" title="Envoyer un email">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </button>
+          <button class="btn-icon" title="Convoquer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="profile-details">
+        <div class="detail-item" *ngIf="candidate.email">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+          <span>{{ candidate.email }}</span>
+        </div>
+        <div class="detail-item" *ngIf="candidate.address">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+          <span>{{ candidate.address }}</span>
+        </div>
+        <div class="detail-item" *ngIf="candidate.submitDate">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <span>Candidature soumise le {{ formatDate(candidate.submitDate) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Score IA et Matching -->
+    <div class="grid-2">
+      <div class="card score-card">
+        <div class="card-header">
+          <h3>Score IA de pertinence</h3>
+          <span class="badge" [ngClass]="getScoreBadgeClass()">{{ candidate.scoreIA || 0 }}%</span>
+        </div>
+        <div class="score-details">
+          <div class="score-item">
+            <span class="score-label">Compétences</span>
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="candidate.matchingCompetences || 0"></div>
+            </div>
+            <span class="score-value">{{ candidate.matchingCompetences || 0 }}%</span>
+          </div>
+          <div class="score-item">
+            <span class="score-label">Diplômes</span>
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="candidate.matchingDiploma || 0"></div>
+            </div>
+            <span class="score-value">{{ candidate.matchingDiploma || 0 }}%</span>
+          </div>
+          <div class="score-item">
+            <span class="score-label">Expérience</span>
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="candidate.matchingExperience || 0"></div>
+            </div>
+            <span class="score-value">{{ candidate.matchingExperience || 0 }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card ia-card">
+        <div class="card-header">
+          <h3>Analyse IA</h3>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div class="ia-content">
+          <p *ngIf="candidate.justificationIA">{{ candidate.justificationIA }}</p>
+          <p *ngIf="!candidate.justificationIA" class="no-data">Aucune analyse disponible</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Documents -->
+    <div class="card documents-card">
+      <div class="card-header">
+        <h3>Documents du candidat</h3>
+      </div>
+      <div class="documents-list">
+        <div class="document-item" *ngIf="candidate.cvUrl">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+            <polyline points="13 2 13 9 20 9"/>
+          </svg>
+          <div class="document-info">
+            <span class="document-name">Curriculum Vitae</span>
+            <span class="document-type">PDF</span>
+          </div>
+          <div class="document-actions">
+            <button class="btn-secondary-small" (click)="downloadCV()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Télécharger
+            </button>
+            <button class="btn-secondary-small" (click)="viewCV()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              Voir
+            </button>
+          </div>
+        </div>
+        <p *ngIf="!candidate.cvUrl" class="no-data">Aucun document disponible</p>
+      </div>
+    </div>
+
+    <!-- Section Évaluations -->
+    <div class="card evaluations-card">
+      <div class="card-header">
+        <h3>Évaluations de la commission</h3>
+        <span class="badge-info">{{ candidate.evaluationCount || 0 }} évaluation(s)</span>
+      </div>
+
+      <!-- Moyennes des scores -->
+      <div class="average-scores" *ngIf="candidate.averageScores">
+        <div class="average-item">
+          <span class="average-label">Compétences techniques</span>
+          <div class="stars">
+            <span *ngFor="let star of getStarsArray(candidate.averageScores.averageCompetenceScore)" class="star filled">★</span>
+            <span *ngFor="let star of getEmptyStarsArray(candidate.averageScores.averageCompetenceScore)" class="star">★</span>
+          </div>
+          <span class="average-value">{{ candidate.averageScores.averageCompetenceScore || 0 }}/5</span>
+        </div>
+        <div class="average-item">
+          <span class="average-label">Compétences comportementales</span>
+          <div class="stars">
+            <span *ngFor="let star of getStarsArray(candidate.averageScores.averageSoftSkillsScore)" class="star filled">★</span>
+            <span *ngFor="let star of getEmptyStarsArray(candidate.averageScores.averageSoftSkillsScore)" class="star">★</span>
+          </div>
+          <span class="average-value">{{ candidate.averageScores.averageSoftSkillsScore || 0 }}/5</span>
+        </div>
+        <div class="average-item">
+          <span class="average-label">Expérience professionnelle</span>
+          <div class="stars">
+            <span *ngFor="let star of getStarsArray(candidate.averageScores.averageExperienceScore)" class="star filled">★</span>
+            <span *ngFor="let star of getEmptyStarsArray(candidate.averageScores.averageExperienceScore)" class="star">★</span>
+          </div>
+          <span class="average-value">{{ candidate.averageScores.averageExperienceScore || 0 }}/5</span>
+        </div>
+        <div class="average-item">
+          <span class="average-label">Motivation</span>
+          <div class="stars">
+            <span *ngFor="let star of getStarsArray(candidate.averageScores.averageMotivationScore)" class="star filled">★</span>
+            <span *ngFor="let star of getEmptyStarsArray(candidate.averageScores.averageMotivationScore)" class="star">★</span>
+          </div>
+          <span class="average-value">{{ candidate.averageScores.averageMotivationScore || 0 }}/5</span>
+        </div>
+      </div>
+
+      <!-- Ma propre évaluation -->
+<!--      <div class="my-evaluation-section">-->
+<!--        <h4 *ngIf="!candidate.alreadyEvaluatedByMe">Ajouter mon évaluation</h4>-->
+<!--        <h4 *ngIf="candidate.alreadyEvaluatedByMe">Mon évaluation</h4>-->
+
+<!--        <div class="evaluation-form" *ngIf="!candidate.alreadyEvaluatedByMe">-->
+<!--          <div class="form-group">-->
+<!--            <label>Compétences techniques</label>-->
+<!--            <div class="star-rating">-->
+<!--              <span *ngFor="let star of [1,2,3,4,5]" class="star-input" [class.filled]="star <= myEvaluation.technicalSkills" (click)="setRating('technicalSkills', star)">★</span>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="form-group">-->
+<!--            <label>Compétences comportementales</label>-->
+<!--            <div class="star-rating">-->
+<!--              <span *ngFor="let star of [1,2,3,4,5]" class="star-input" [class.filled]="star <= myEvaluation.behavioralSkills" (click)="setRating('behavioralSkills', star)">★</span>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="form-group">-->
+<!--            <label>Expérience professionnelle</label>-->
+<!--            <div class="star-rating">-->
+<!--              <span *ngFor="let star of [1,2,3,4,5]" class="star-input" [class.filled]="star <= myEvaluation.professionalExperience" (click)="setRating('professionalExperience', star)">★</span>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="form-group">-->
+<!--            <label>Motivation</label>-->
+<!--            <div class="star-rating">-->
+<!--              <span *ngFor="let star of [1,2,3,4,5]" class="star-input" [class.filled]="star <= myEvaluation.motivation" (click)="setRating('motivation', star)">★</span>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="form-group">-->
+<!--            <label>Commentaire</label>-->
+<!--            <textarea [(ngModel)]="myEvaluation.comment" placeholder="Votre commentaire sur cette candidature..." rows="4"></textarea>-->
+<!--          </div>-->
+<!--          <button class="btn-primary" (click)="submitEvaluation()" [disabled]="!isEvaluationValid()">-->
+<!--            Soumettre mon évaluation-->
+<!--          </button>-->
+<!--        </div>-->
+
+<!--        <div class="already-evaluated" *ngIf="candidate.alreadyEvaluatedByMe">-->
+<!--          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">-->
+<!--            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>-->
+<!--            <polyline points="22 4 12 14.01 9 11.01"/>-->
+<!--          </svg>-->
+<!--          <p>Vous avez déjà évalué ce candidat</p>-->
+<!--        </div>-->
+<!--      </div>-->
+
+      <!-- Liste des évaluations -->
+      <div class="evaluations-list" *ngIf="candidate.evaluations && candidate.evaluations.length > 0">
+        <h4>Toutes les évaluations</h4>
+        <div class="evaluation-item" *ngFor="let evaluation of candidate.evaluations">
+          <div class="evaluation-header">
+            <div class="evaluator-avatar">{{ getEvaluatorInitials(evaluation) }}</div>
+            <div class="evaluator-info">
+              <span class="evaluator-name">{{ evaluation.evaluatorName }}</span>
+              <span class="evaluation-date">{{ formatDate(evaluation.createdAt) }}</span>
+            </div>
+          </div>
+          <div class="evaluation-scores">
+            <div class="mini-score">
+              <span>Technique:</span>
+              <div class="mini-stars">
+                <span *ngFor="let star of getStarsArray(evaluation.competenceScore)" class="star-mini filled">★</span>
+              </div>
+            </div>
+            <div class="mini-score">
+              <span>Comportement:</span>
+              <div class="mini-stars">
+                <span *ngFor="let star of getStarsArray(evaluation.softSkillsScore)" class="star-mini filled">★</span>
+              </div>
+            </div>
+            <div class="mini-score">
+              <span>Expérience:</span>
+              <div class="mini-stars">
+                <span *ngFor="let star of getStarsArray(evaluation.experienceScore)" class="star-mini filled">★</span>
+              </div>
+            </div>
+            <div class="mini-score">
+              <span>Motivation:</span>
+              <div class="mini-stars">
+                <span *ngFor="let star of getStarsArray(evaluation.motivationScore)" class="star-mini filled">★</span>
+              </div>
+            </div>
+          </div>
+          <p class="evaluation-comment" *ngIf="evaluation.comment">{{ evaluation.comment }}</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+<!--</div>-->

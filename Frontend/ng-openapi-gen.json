@@ -1,0 +1,6 @@
+{
+  "input": "src/open-api/openApi.json",
+  "output": "src/app/api",
+  "ignoreUnusedModels": false,
+  "responseType": "json"
+}

@@ -54,15 +54,20 @@ public class BeansConfig {
         config.setAllowedHeaders(Arrays.asList(
                 HttpHeaders.ORIGIN,
                 CONTENT_TYPE,
-                AUTHORIZATION
+                AUTHORIZATION,
+                HttpHeaders.ACCEPT,
+                "X-Requested-With"
         ));
         config.setAllowedMethods(Arrays.asList(
                 "GET",
                 "POST",
                 "PUT",
                 "PATCH",
-                "DELETE"
+                "DELETE",
+                "OPTIONS",  // ✅ CRITIQUE
+                "HEAD"
         ));
+        config.setMaxAge(3600L);
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }

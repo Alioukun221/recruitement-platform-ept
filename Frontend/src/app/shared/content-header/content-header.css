@@ -1,0 +1,34 @@
+
+.content-header {
+  margin: 24px 0;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 8px 0;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.breadcrumb-item {
+  color: #6b7280;
+}
+
+.breadcrumb-active {
+  color: #3b82f6;
+  font-weight: 500;
+}
+
+.breadcrumb-separator {
+  width: 16px;
+  height: 16px;
+  color: #9ca3af;
+}
+

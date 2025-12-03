@@ -1,0 +1,3337 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "OpenApi specification - Alioukun",
+    "description": "Backend du site de recrutement de l'EPT",
+    "contact": {
+      "name": "Mouhamadou Aliou BA- Fa Syaka Diouf",
+      "email": "bmouhamadoualiou@ept.sn"
+    },
+    "license": {
+      "name": "MIT"
+    },
+    "version": ""
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/api/v1",
+      "description": "Local ENV"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/rh/update-job-offers/{id}": {
+      "put": {
+        "tags": [
+          "Gestion des offres"
+        ],
+        "operationId": "updateJobOffer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateJobOfferDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobOfferResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rh/commissions/{commissionId}": {
+      "get": {
+        "tags": [
+          "Gestion des commissions de recrutement"
+        ],
+        "operationId": "getCommissionById",
+        "parameters": [
+          {
+            "name": "commissionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommissionResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Gestion des commissions de recrutement"
+        ],
+        "operationId": "updateCommission",
+        "parameters": [
+          {
+            "name": "commissionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCommissionDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommissionResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Gestion des commissions de recrutement"
+        ],
+        "operationId": "deleteCommission",
+        "parameters": [
+          {
+            "name": "commissionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/rh/commissions/{commissionId}/president/{memberId}": {
+      "put": {
+        "tags": [
+          "Gestion des commissions de recrutement"
+        ],
+        "operationId": "changePresident",
+        "parameters": [
+          {
+            "name": "commissionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "memberId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommissionMemberResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rh/applications/{applicationId}/status": {
+      "put": {
+        "tags": [
+          "Gestion des candidatures"
+        ],
+        "operationId": "updateApplicationStatus",
+        "parameters": [
+          {
+            "name": "applicationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateApplicationStatusDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDetailDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rh/applications/{applicationId}/reject": {
+      "put": {
+        "tags": [
+          "Gestion des candidatures"
+        ],
+        "operationId": "rejectApplication",
+        "parameters": [
+          {
+            "name": "applicationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDetailDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/commission-member/commissions/{commissionId}/applications/{applicationId}/evaluate": {
+      "put": {
+        "tags": [
+          "Membre de commission (notations && commentaires)"
+        ],
+        "operationId": "updateMyEvaluation",
+        "parameters": [
+          {
+            "name": "commissionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "applicationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEvaluationDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvaluationResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Membre de commission (notations && commentaires)"
+        ],
+        "operationId": "evaluateApplication",
+        "parameters": [
+          {
+            "name": "commissionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "applicationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEvaluationDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvaluationResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhook/ia-result": {
+      "post": {
+        "tags": [
+          "webhook-controller"
+        ],
+        "operationId": "receiveIAResult",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessCVResponseDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rh/create-job-offers": {
+      "post": {
+        "tags": [
+          "Gestion des offres"
+        ],
+        "operationId": "createJobOffer",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateJobOfferDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobOfferResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rh/commissions": {
+      "get": {
+        "tags": [
+          "Gestion des commissions de recrutement"
+        ],
+        "operationId": "getAllCommissions",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ACTIVE",
+                "CLOSED",
+                "ARCHIVED"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CommissionListDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Gestion des commissions de recrutement"
+        ],
+        "operationId": "createCommission",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCommissionDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommissionResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rh/commissions/{commissionId}/members": {
+      "get": {
+        "tags": [
+          "Gestion des commissions de recrutement"
+        ],
+        "operationId": "getCommissionMembers",
+        "parameters": [
+          {
+            "name": "commissionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CommissionMemberResponseDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Gestion des commissions de recrutement"
+        ],
+        "operationId": "addMember",
+        "parameters": [
+          {
+            "name": "commissionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCommissionMemberDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommissionMemberResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rh/applications/job-offer/{jobOfferId}/shortlist": {
+      "post": {
+        "tags": [
+          "Gestion des candidatures"
+        ],
+        "operationId": "shortlistApplications",
+        "parameters": [
+          {
+            "name": "jobOfferId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShortlistApplicationsDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApplicationDetailDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rh/applications/job-offer/{jobOfferId}/reject-multiple": {
+      "post": {
+        "tags": [
+          "Gestion des candidatures"
+        ],
+        "operationId": "rejectMultipleApplications",
+        "parameters": [
+          {
+            "name": "jobOfferId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShortlistApplicationsDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApplicationDetailDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/candidate/job-offers/{jobOfferId}/apply": {
+      "post": {
+        "tags": [
+          "Candidats"
+        ],
+        "operationId": "submitApplication",
+        "parameters": [
+          {
+            "name": "jobOfferId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "firstName",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lastName",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "phoneNumber",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "address",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "nationality",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "highestDegree",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "majorField",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "educationalInstitution",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "yearOfGraduation",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "motivationEcole",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "motivationPosition",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "availableImmediately",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "certifyAccurate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "consentGDPR",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "electronicSignature",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "cv": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationSubmissionResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/register/rh": {
+      "post": {
+        "tags": [
+          "Authentification"
+        ],
+        "operationId": "registerRh",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RhRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/register/commission-member": {
+      "post": {
+        "tags": [
+          "Authentification"
+        ],
+        "operationId": "registerCommissionMember",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommissionMemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/register/candidate": {
+      "post": {
+        "tags": [
+          "Authentification"
+        ],
+        "operationId": "register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/authenticate": {
+      "post": {
+        "tags": [
+          "Authentification"
+        ],
+        "operationId": "authenticate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rh/job-offers": {
+      "get": {
+        "tags": [
+          "Gestion des offres"
+        ],
+        "operationId": "getAllJobOffers",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DRAFT",
+                "PUBLISHED",
+                "SUSPENDED",
+                "ARCHIVED"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JobOfferListDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rh/job-offers/{id}": {
+      "get": {
+        "tags": [
+          "Gestion des offres"
+        ],
+        "operationId": "getJobOfferById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobOfferResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rh/dashboard": {
+      "get": {
+        "tags": [
+          "Dashboard RH"
+        ],
+        "operationId": "getDashboard",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RHDashboardDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rh/commissions/get_all_commissions_members": {
+      "get": {
+        "tags": [
+          "Gestion des commissions de recrutement"
+        ],
+        "operationId": "getAllCommissionMemberUsers",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CommissionMemberUserDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rh/applications/{applicationId}": {
+      "get": {
+        "tags": [
+          "Gestion des candidatures"
+        ],
+        "operationId": "getApplicationDetails",
+        "parameters": [
+          {
+            "name": "applicationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDetailDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rh/applications/job-offer/{jobOfferId}": {
+      "get": {
+        "tags": [
+          "Gestion des candidatures"
+        ],
+        "operationId": "getApplicationsByJobOffer",
+        "parameters": [
+          {
+            "name": "jobOfferId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DRAFT",
+                "SUBMITTED",
+                "UNDER_REVIEW",
+                "AI_SCORED",
+                "SHORTLISTED",
+                "INTERVIEW_SCHEDULED",
+                "INTERVIEW_COMPLETED",
+                "ACCEPTED",
+                "REJECTED",
+                "WITHDRAWN"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApplicationListDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rh/applications/job-offer/{jobOfferId}/stats": {
+      "get": {
+        "tags": [
+          "Gestion des candidatures"
+        ],
+        "operationId": "getApplicationStats",
+        "parameters": [
+          {
+            "name": "jobOfferId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationStatsDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rh/applications/job-offer/{jobOfferId}/shortlisted": {
+      "get": {
+        "tags": [
+          "Gestion des candidatures"
+        ],
+        "operationId": "getShortlistedApplications",
+        "parameters": [
+          {
+            "name": "jobOfferId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApplicationDetailDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rh/applications/job-offer/{jobOfferId}/by-score": {
+      "get": {
+        "tags": [
+          "Gestion des candidatures"
+        ],
+        "operationId": "getApplicationsByMinScore",
+        "parameters": [
+          {
+            "name": "jobOfferId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "minScore",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApplicationListDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/commission-member/my-commissions": {
+      "get": {
+        "tags": [
+          "Membre de commission (notations && commentaires)"
+        ],
+        "operationId": "getMyCommissions",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MemberCommissionDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/commission-member/commissions/{commissionId}/applications": {
+      "get": {
+        "tags": [
+          "Membre de commission (notations && commentaires)"
+        ],
+        "operationId": "getShortlistedApplications_1",
+        "parameters": [
+          {
+            "name": "commissionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CommissionApplicationListDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/commission-member/commissions/{commissionId}/applications/{applicationId}": {
+      "get": {
+        "tags": [
+          "Membre de commission (notations && commentaires)"
+        ],
+        "operationId": "getApplicationDetails_1",
+        "parameters": [
+          {
+            "name": "commissionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "applicationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommissionApplicationDetailDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/commission-member/commissions/{commissionId}/applications/{applicationId}/my-evaluation": {
+      "get": {
+        "tags": [
+          "Membre de commission (notations && commentaires)"
+        ],
+        "operationId": "getMyEvaluation",
+        "parameters": [
+          {
+            "name": "commissionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "applicationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvaluationResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Membre de commission (notations && commentaires)"
+        ],
+        "operationId": "deleteMyEvaluation",
+        "parameters": [
+          {
+            "name": "commissionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "applicationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/commission-member/commissions/{commissionId}/applications/{applicationId}/cv": {
+      "get": {
+        "tags": [
+          "Membre de commission (notations && commentaires)"
+        ],
+        "operationId": "viewCV",
+        "parameters": [
+          {
+            "name": "commissionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "applicationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/candidate/my-applications": {
+      "get": {
+        "tags": [
+          "Candidats"
+        ],
+        "operationId": "getMyApplications",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CandidateApplicationHistoryDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/candidate/my-applications/{applicationId}": {
+      "get": {
+        "tags": [
+          "Candidats"
+        ],
+        "operationId": "getMyApplicationDetail",
+        "parameters": [
+          {
+            "name": "applicationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CandidateApplicationDetailDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Candidats"
+        ],
+        "operationId": "withdrawApplication",
+        "parameters": [
+          {
+            "name": "applicationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/candidate/job-offers": {
+      "get": {
+        "tags": [
+          "Candidats"
+        ],
+        "operationId": "getAvailableJobOffers",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicJobOfferListDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/candidate/job-offers/{jobOfferId}": {
+      "get": {
+        "tags": [
+          "Candidats"
+        ],
+        "operationId": "getJobOfferDetails",
+        "parameters": [
+          {
+            "name": "jobOfferId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicJobOfferDetailDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/candidate/job-offers/search": {
+      "get": {
+        "tags": [
+          "Candidats"
+        ],
+        "operationId": "searchJobOffers",
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicJobOfferListDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rh/{id}": {
+      "delete": {
+        "tags": [
+          "Gestion des offres"
+        ],
+        "operationId": "deleteJobOffer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/rh/commissions/{commissionId}/members/{memberId}": {
+      "delete": {
+        "tags": [
+          "Gestion des commissions de recrutement"
+        ],
+        "operationId": "removeMember",
+        "parameters": [
+          {
+            "name": "commissionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "memberId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UpdateJobOfferDTO": {
+        "type": "object",
+        "properties": {
+          "jobTitle": {
+            "type": "string"
+          },
+          "jobType": {
+            "type": "string",
+            "enum": [
+              "PER",
+              "PATS",
+              "CONTRACTUEL"
+            ]
+          },
+          "typeContrat": {
+            "type": "string",
+            "enum": [
+              "CDD",
+              "CDI",
+              "STAGE"
+            ]
+          },
+          "jobStatus": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PUBLISHED",
+              "SUSPENDED",
+              "ARCHIVED"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "requiredSkills": {
+            "type": "string"
+          },
+          "niveauEtudeRequis": {
+            "type": "string"
+          },
+          "experienceMin": {
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32"
+          },
+          "dateLimite": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "JobOfferResponseDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "jobTitle": {
+            "type": "string"
+          },
+          "jobType": {
+            "type": "string",
+            "enum": [
+              "PER",
+              "PATS",
+              "CONTRACTUEL"
+            ]
+          },
+          "typeContrat": {
+            "type": "string",
+            "enum": [
+              "CDD",
+              "CDI",
+              "STAGE"
+            ]
+          },
+          "jobStatus": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PUBLISHED",
+              "SUSPENDED",
+              "ARCHIVED"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "requiredSkills": {
+            "type": "string"
+          },
+          "niveauEtudeRequis": {
+            "type": "string"
+          },
+          "experienceMin": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "datePublication": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastModifiedDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "dateLimite": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdById": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "createdByName": {
+            "type": "string"
+          },
+          "applicationCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "UpdateCommissionDTO": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "CLOSED",
+              "ARCHIVED"
+            ]
+          }
+        }
+      },
+      "CommissionMemberResponseDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "userEmail": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "expertiseArea": {
+            "type": "string"
+          }
+        }
+      },
+      "CommissionResponseDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "CLOSED",
+              "ARCHIVED"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdById": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "createdByName": {
+            "type": "string"
+          },
+          "jobOfferId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "jobOfferTitle": {
+            "type": "string"
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommissionMemberResponseDTO"
+            }
+          },
+          "memberCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "president": {
+            "$ref": "#/components/schemas/CommissionMemberResponseDTO"
+          }
+        }
+      },
+      "UpdateApplicationStatusDTO": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "SUBMITTED",
+              "UNDER_REVIEW",
+              "AI_SCORED",
+              "SHORTLISTED",
+              "INTERVIEW_SCHEDULED",
+              "INTERVIEW_COMPLETED",
+              "ACCEPTED",
+              "REJECTED",
+              "WITHDRAWN"
+            ]
+          },
+          "comment": {
+            "type": "string"
+          }
+        }
+      },
+      "ApplicationDetailDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "candidateId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "highestDegree": {
+            "type": "string"
+          },
+          "majorField": {
+            "type": "string"
+          },
+          "cvUrl": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "SUBMITTED",
+              "UNDER_REVIEW",
+              "AI_SCORED",
+              "SHORTLISTED",
+              "INTERVIEW_SCHEDULED",
+              "INTERVIEW_COMPLETED",
+              "ACCEPTED",
+              "REJECTED",
+              "WITHDRAWN"
+            ]
+          },
+          "scoreIA": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "matchingCompetences": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "matchingExperience": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "matchingDiploma": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "justificationIA": {
+            "type": "string"
+          },
+          "submitDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updateDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "jobOfferId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "jobOfferTitle": {
+            "type": "string"
+          },
+          "evaluationCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CreateEvaluationDTO": {
+        "required": [
+          "competenceScore",
+          "diplomaScore",
+          "experienceScore",
+          "motivationScore",
+          "softSkillsScore"
+        ],
+        "type": "object",
+        "properties": {
+          "competenceScore": {
+            "maximum": 5,
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32"
+          },
+          "experienceScore": {
+            "maximum": 5,
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32"
+          },
+          "diplomaScore": {
+            "maximum": 5,
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32"
+          },
+          "motivationScore": {
+            "maximum": 5,
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32"
+          },
+          "softSkillsScore": {
+            "maximum": 5,
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32"
+          },
+          "comment": {
+            "maxLength": 2000,
+            "minLength": 0,
+            "type": "string"
+          }
+        }
+      },
+      "EvaluationResponseDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "evaluatorId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "evaluatorName": {
+            "type": "string"
+          },
+          "evaluatorRole": {
+            "type": "string"
+          },
+          "competenceScore": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "experienceScore": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "diplomaScore": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "motivationScore": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "softSkillsScore": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalScore": {
+            "type": "number",
+            "format": "double"
+          },
+          "comment": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "IAScoringResultDTO": {
+        "type": "object",
+        "properties": {
+          "justification": {
+            "type": "string"
+          },
+          "recommendation": {
+            "type": "string"
+          },
+          "strengths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "weaknesses": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "score_global": {
+            "type": "number",
+            "format": "double"
+          },
+          "matching_competences": {
+            "type": "number",
+            "format": "double"
+          },
+          "matching_experience": {
+            "type": "number",
+            "format": "double"
+          },
+          "matching_diploma": {
+            "type": "number",
+            "format": "double"
+          },
+          "matching_motivation": {
+            "type": "number",
+            "format": "double"
+          },
+          "missing_skills": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ProcessCVResponseDTO": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "application_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "scoring_result": {
+            "$ref": "#/components/schemas/IAScoringResultDTO"
+          },
+          "error_message": {
+            "type": "string"
+          },
+          "total_processing_time": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "CreateJobOfferDTO": {
+        "required": [
+          "description",
+          "experienceMin",
+          "jobTitle",
+          "jobType",
+          "niveauEtudeRequis",
+          "requiredSkills",
+          "typeContrat"
+        ],
+        "type": "object",
+        "properties": {
+          "jobTitle": {
+            "type": "string"
+          },
+          "jobType": {
+            "type": "string",
+            "enum": [
+              "PER",
+              "PATS",
+              "CONTRACTUEL"
+            ]
+          },
+          "typeContrat": {
+            "type": "string",
+            "enum": [
+              "CDD",
+              "CDI",
+              "STAGE"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "requiredSkills": {
+            "type": "string"
+          },
+          "niveauEtudeRequis": {
+            "type": "string"
+          },
+          "experienceMin": {
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32"
+          },
+          "dateLimite": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateCommissionDTO": {
+        "required": [
+          "jobOfferId",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 150,
+            "minLength": 0,
+            "type": "string"
+          },
+          "description": {
+            "maxLength": 255,
+            "minLength": 0,
+            "type": "string"
+          },
+          "jobOfferId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "AddCommissionMemberDTO": {
+        "required": [
+          "role",
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "role": {
+            "type": "string"
+          },
+          "expertiseArea": {
+            "maxLength": 255,
+            "minLength": 0,
+            "type": "string"
+          }
+        }
+      },
+      "ShortlistApplicationsDTO": {
+        "type": "object",
+        "properties": {
+          "applicationIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+      },
+      "ApplicationSubmissionResponseDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "message": {
+            "type": "string"
+          },
+          "jobOfferId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "jobOfferTitle": {
+            "type": "string"
+          },
+          "candidateName": {
+            "type": "string"
+          },
+          "submitDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "RhRequest": {
+        "required": [
+          "firstName",
+          "lastName",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 2147483647,
+            "minLength": 8,
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "positionTitle": {
+            "type": "string"
+          },
+          "department": {
+            "type": "string"
+          }
+        }
+      },
+      "CommissionMemberRequest": {
+        "required": [
+          "firstName",
+          "lastName",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 2147483647,
+            "minLength": 8,
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "expertiseArea": {
+            "type": "string"
+          }
+        }
+      },
+      "RegistrationRequest": {
+        "required": [
+          "firstName",
+          "lastName",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 2147483647,
+            "minLength": 8,
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "adress": {
+            "type": "string"
+          }
+        }
+      },
+      "LoginRequest": {
+        "required": [
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "password": {
+            "maxLength": 2147483647,
+            "minLength": 8,
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        }
+      },
+      "JobOfferListDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "jobTitle": {
+            "type": "string"
+          },
+          "jobType": {
+            "type": "string",
+            "enum": [
+              "PER",
+              "PATS",
+              "CONTRACTUEL"
+            ]
+          },
+          "typeContrat": {
+            "type": "string",
+            "enum": [
+              "CDD",
+              "CDI",
+              "STAGE"
+            ]
+          },
+          "jobStatus": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PUBLISHED",
+              "SUSPENDED",
+              "ARCHIVED"
+            ]
+          },
+          "datePublication": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "dateLimite": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "applicationCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ApplicationStatsDTO": {
+        "type": "object",
+        "properties": {
+          "totalApplications": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "submittedApplications": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "underReviewApplications": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "shortlistedApplications": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rejectedApplications": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "withdrawnApplications": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "applicationsLast30Days": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "growthRate": {
+            "type": "number",
+            "format": "double"
+          },
+          "averageIAScore": {
+            "type": "number",
+            "format": "double"
+          },
+          "applicationsByEducationLevel": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "topOffersByApplications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JobOfferApplicationCountDTO"
+            }
+          }
+        }
+      },
+      "CommissionActivityDTO": {
+        "type": "object",
+        "properties": {
+          "commissionId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "commissionName": {
+            "type": "string"
+          },
+          "jobOfferTitle": {
+            "type": "string"
+          },
+          "membersCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "candidatesCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "evaluationsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "completionRate": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "CommissionStatsDTO": {
+        "type": "object",
+        "properties": {
+          "totalCommissions": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "activeCommissions": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCommissionMembers": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalEvaluations": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "evaluationCompletionRate": {
+            "type": "number",
+            "format": "double"
+          },
+          "mostActiveCommission": {
+            "$ref": "#/components/schemas/CommissionActivityDTO"
+          },
+          "averageMembersPerCommission": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "DashboardAlertDTO": {
+        "type": "object",
+        "properties": {
+          "alertType": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "actionUrl": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "DashboardOverviewDTO": {
+        "type": "object",
+        "properties": {
+          "totalActiveJobOffers": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCandidates": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalApplications": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCommissions": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "candidatesShortlisted": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "candidatesInterviewed": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "candidatesAccepted": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pendingEvaluations": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "JobOfferApplicationCountDTO": {
+        "type": "object",
+        "properties": {
+          "jobOfferId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "jobTitle": {
+            "type": "string"
+          },
+          "applicationCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "shortlistedCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "JobOfferStatsDTO": {
+        "type": "object",
+        "properties": {
+          "totalJobOffers": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "publishedJobOffers": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "draftJobOffers": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "closedJobOffers": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "archivedJobOffers": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "jobOffersByType": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "jobOffersByContract": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "jobOffersExpiringSoon": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "averageCandidatesPerOffer": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "RHDashboardDTO": {
+        "type": "object",
+        "properties": {
+          "overview": {
+            "$ref": "#/components/schemas/DashboardOverviewDTO"
+          },
+          "jobOfferStats": {
+            "$ref": "#/components/schemas/JobOfferStatsDTO"
+          },
+          "applicationStats": {
+            "$ref": "#/components/schemas/ApplicationStatsDTO"
+          },
+          "commissionStats": {
+            "$ref": "#/components/schemas/CommissionStatsDTO"
+          },
+          "topJobOffers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TopJobOfferDTO"
+            }
+          },
+          "recentActivities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecentActivityDTO"
+            }
+          },
+          "alerts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DashboardAlertDTO"
+            }
+          }
+        }
+      },
+      "RecentActivityDTO": {
+        "type": "object",
+        "properties": {
+          "activityType": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          },
+          "relatedEntity": {
+            "type": "string"
+          },
+          "entityId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "TopJobOfferDTO": {
+        "type": "object",
+        "properties": {
+          "jobOfferId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "jobTitle": {
+            "type": "string"
+          },
+          "totalApplications": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "shortlistedCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "averageIAScore": {
+            "type": "number",
+            "format": "double"
+          },
+          "daysActive": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "CommissionListDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "CLOSED",
+              "ARCHIVED"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "jobOfferId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "jobOfferTitle": {
+            "type": "string"
+          },
+          "memberCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "presidentName": {
+            "type": "string"
+          }
+        }
+      },
+      "CommissionMemberUserDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "ApplicationListDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "candidateName": {
+            "type": "string"
+          },
+          "candidateEmail": {
+            "type": "string"
+          },
+          "highestDegree": {
+            "type": "string"
+          },
+          "majorField": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "SUBMITTED",
+              "UNDER_REVIEW",
+              "AI_SCORED",
+              "SHORTLISTED",
+              "INTERVIEW_SCHEDULED",
+              "INTERVIEW_COMPLETED",
+              "ACCEPTED",
+              "REJECTED",
+              "WITHDRAWN"
+            ]
+          },
+          "scoreIA": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "submitDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cvUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "MemberCommissionDTO": {
+        "type": "object",
+        "properties": {
+          "commissionId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "commissionName": {
+            "type": "string"
+          },
+          "jobOfferTitle": {
+            "type": "string"
+          },
+          "myRole": {
+            "type": "string"
+          },
+          "shortlistedCandidatesCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "myEvaluationsCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CommissionApplicationListDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "candidateName": {
+            "type": "string"
+          },
+          "candidateEmail": {
+            "type": "string"
+          },
+          "highestDegree": {
+            "type": "string"
+          },
+          "specialization": {
+            "type": "string"
+          },
+          "scoreIA": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "submitDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cvUrl": {
+            "type": "string"
+          },
+          "evaluationCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "averageCommissionScore": {
+            "type": "number",
+            "format": "double"
+          },
+          "alreadyEvaluatedByMe": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CommissionApplicationDetailDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "highestDegree": {
+            "type": "string"
+          },
+          "specialization": {
+            "type": "string"
+          },
+          "cvUrl": {
+            "type": "string"
+          },
+          "scoreIA": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "matchingCompetences": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "matchingExperience": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "matchingDiploma": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "justificationIA": {
+            "type": "string"
+          },
+          "submitDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "jobOfferId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "jobOfferTitle": {
+            "type": "string"
+          },
+          "evaluations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EvaluationResponseDTO"
+            }
+          },
+          "evaluationCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "averageScores": {
+            "$ref": "#/components/schemas/EvaluationAverageDTO"
+          },
+          "alreadyEvaluatedByMe": {
+            "type": "boolean"
+          }
+        }
+      },
+      "EvaluationAverageDTO": {
+        "type": "object",
+        "properties": {
+          "averageCompetenceScore": {
+            "type": "number",
+            "format": "double"
+          },
+          "averageExperienceScore": {
+            "type": "number",
+            "format": "double"
+          },
+          "averageDiplomaScore": {
+            "type": "number",
+            "format": "double"
+          },
+          "averageMotivationScore": {
+            "type": "number",
+            "format": "double"
+          },
+          "averageSoftSkillsScore": {
+            "type": "number",
+            "format": "double"
+          },
+          "overallAverage": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "CandidateApplicationHistoryDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "jobOfferId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "jobTitle": {
+            "type": "string"
+          },
+          "jobType": {
+            "type": "string",
+            "enum": [
+              "PER",
+              "PATS",
+              "CONTRACTUEL"
+            ]
+          },
+          "typeContrat": {
+            "type": "string",
+            "enum": [
+              "CDD",
+              "CDI",
+              "STAGE"
+            ]
+          },
+          "status": {
+            "type": "string"
+          },
+          "submitDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastUpdateDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cvUrl": {
+            "type": "string"
+          },
+          "canWithdraw": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CandidateApplicationDetailDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "jobOfferId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "jobTitle": {
+            "type": "string"
+          },
+          "jobDescription": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "highestDegree": {
+            "type": "string"
+          },
+          "specialization": {
+            "type": "string"
+          },
+          "cvUrl": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "submitDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastUpdateDate": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PublicJobOfferListDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "jobTitle": {
+            "type": "string"
+          },
+          "jobType": {
+            "type": "string",
+            "enum": [
+              "PER",
+              "PATS",
+              "CONTRACTUEL"
+            ]
+          },
+          "typeContrat": {
+            "type": "string",
+            "enum": [
+              "CDD",
+              "CDI",
+              "STAGE"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "niveauEtudeRequis": {
+            "type": "string"
+          },
+          "experienceMin": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "datePublication": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "dateLimite": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "applicationCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "requiredSkills": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "PublicJobOfferDetailDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "jobTitle": {
+            "type": "string"
+          },
+          "jobType": {
+            "type": "string",
+            "enum": [
+              "PER",
+              "PATS",
+              "CONTRACTUEL"
+            ]
+          },
+          "typeContrat": {
+            "type": "string",
+            "enum": [
+              "CDD",
+              "CDI",
+              "STAGE"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "requiredSkills": {
+            "type": "string"
+          },
+          "niveauEtudeRequis": {
+            "type": "string"
+          },
+          "experienceMin": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "datePublication": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "dateLimite": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "applicationCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "companyName": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "description": "JWT auth description",
+        "in": "header",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

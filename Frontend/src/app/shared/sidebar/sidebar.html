@@ -1,0 +1,129 @@
+<aside class="sidebar" [class.close]="isSidebarOpen">
+  <div class="sidebar-header">
+    <div class="logo-container">
+      <div class="logo-icon">
+        <img class="logo-image" src="assets/images/images-removebg-preview.png">
+      </div>
+      <span class="logo-text">PolyRecruit</span>
+    </div>
+    <button class="menu-button" (click)="toggleSidebar()">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+        <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+        <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+        <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+      </svg>
+    </button>
+  </div>
+
+  <div class="sidebar-content">
+
+
+
+    <div class="sidebar-section">
+      <!-- 🎯 BOUTON CRÉATION D'OFFRE POUR RH -->
+      <div *ngIf="isRH()" class="create-offer-section">
+        <button class="btn-create-offer" (click)="navigateToCreateOffer()">
+          <div class="btn-create-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="16"></line>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+          </div>
+          <div class="btn-create-content">
+            <span class="btn-create-label">Créer une offre</span>
+            <span class="btn-create-subtitle">Nouvelle opportunité</span>
+          </div>
+          <div class="btn-create-arrow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+        </button>
+      </div>
+      <p class="sidebar-section-title">GÉNÉRALE</p>
+      <nav class="sidebar-nav">
+        <!-- Boucle sur les menu items filtrés -->
+        <ng-container *ngFor="let item of getFilteredMenuItems()">
+          <div class="sidebar-group">
+            <!-- Menu avec sous-menu (Offres d'emploi) -->
+            <button
+              *ngIf="item.submenu"
+              (click)="goToOffresEmploi()"
+              class="sidebar-link"
+              [class.sidebar-link-active]="item.route === '/home'">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path [attr.d]="getIconPath(item.icon)"></path>
+              </svg>
+              <span class="flex-1">
+                {{ item.label }}
+                <span *ngIf="item.badge" class="menu-badge">({{ item.badge }})</span>
+              </span>
+
+              <!-- Flèches -->
+              <svg *ngIf="expandedMenubar" class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="18 15 12 9 6 15"></polyline>
+              </svg>
+              <svg *ngIf="!expandedMenubar" class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+
+            <!-- Sous-menu -->
+            <div *ngIf="item.submenu && expandedMenubar" class="sidebar-submenu">
+              <a *ngFor="let subitem of item.submenu"
+                 [routerLink]="subitem.route"
+                 class="sidebar-sublink">
+                {{ subitem.label }}
+              </a>
+            </div>
+
+            <!-- Menu simple (sans sous-menu) -->
+            <a
+              *ngIf="!item.submenu"
+              [routerLink]="item.route"
+              routerLinkActive="sidebar-link-active"
+              class="sidebar-link">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path [attr.d]="getIconPath(item.icon)"></path>
+              </svg>
+              <span>
+                {{ item.label }}
+                <span *ngIf="item.badge" class="notification-badge">{{ item.badge }}</span>
+              </span>
+            </a>
+          </div>
+        </ng-container>
+      </nav>
+    </div>
+
+    <!-- Section TOOLS -->
+    <div class="sidebar-section">
+      <p class="sidebar-section-title">TOOLS</p>
+      <nav class="sidebar-nav">
+        <a *ngFor="let tool of toolsMenuItems"
+           [routerLink]="tool.route"
+           class="sidebar-link">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path [attr.d]="getIconPath(tool.icon)"></path>
+          </svg>
+          <span>{{ tool.label }}</span>
+        </a>
+
+        <!-- Mode Sombre -->
+        <div class="sidebar-link">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <span>Mode Sombre</span>
+          <label class="toggle-switch">
+            <input type="checkbox" />
+            <span class="toggle-slider"></span>
+            <span class="toggle-circle"></span>
+          </label>
+        </div>
+      </nav>
+    </div>
+  </div>
+</aside>

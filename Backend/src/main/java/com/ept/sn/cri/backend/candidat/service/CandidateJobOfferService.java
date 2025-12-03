@@ -153,21 +153,21 @@ public class CandidateJobOfferService {
 
         log.info(" Candidature {} créée avec succès", savedApplication.getId());
 
-//        //  Lancer le traitement IA en asynchrone
-//        if (cvFile != null && !cvFile.isEmpty()) {
-//            log.info(" Lancement du traitement IA pour la candidature {}", savedApplication.getId());
-//            try {
-//                iaService.processCVAsync(savedApplication.getId(), cvFile, jobOffer);
-//                log.info(" Traitement IA démarré en arrière-plan pour candidature {}",
-//                        savedApplication.getId());
-//            } catch (Exception e) {
-//                log.error(" Erreur lors du lancement du traitement IA pour candidature {}: {}",
-//                        savedApplication.getId(), e.getMessage());
-//            }
-//        } else {
-//            log.warn(" Pas de CV fourni, traitement IA non lancé pour candidature {}",
-//                    savedApplication.getId());
-//        }
+        //  Lancer le traitement IA en asynchrone
+        if (cvFile != null && !cvFile.isEmpty()) {
+            log.info(" Lancement du traitement IA pour la candidature {}", savedApplication.getId());
+            try {
+                iaService.processCVAsync(savedApplication.getId(), cvFile, jobOffer);
+                log.info(" Traitement IA démarré en arrière-plan pour candidature {}",
+                        savedApplication.getId());
+            } catch (Exception e) {
+                log.error(" Erreur lors du lancement du traitement IA pour candidature {}: {}",
+                        savedApplication.getId(), e.getMessage());
+            }
+        } else {
+            log.warn(" Pas de CV fourni, traitement IA non lancé pour candidature {}",
+                    savedApplication.getId());
+        }
 
         return ApplicationSubmissionResponseDTO.builder()
                 .id(savedApplication.getId())

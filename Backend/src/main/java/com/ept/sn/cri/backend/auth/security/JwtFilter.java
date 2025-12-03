@@ -28,10 +28,16 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain filterChain)  // ✅ FilterChain, pas FilterChainProxy
+                                    @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        // ✅ Ne bypasse que /auth et /webhook
+        // ✅ CRITIQUE - Ignorer les requêtes OPTIONS (preflight CORS)
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            System.out.println("🔄 OPTIONS request - Skipping JWT filter");
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         if (request.getServletPath().contains("/auth")
                 || request.getServletPath().contains("/webhook/ia-result")) {
             filterChain.doFilter(request, response);
@@ -43,6 +49,7 @@ public class JwtFilter extends OncePerRequestFilter {
         final String email;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            System.out.println("⚠️ No Bearer token for: " + request.getMethod() + " " + request.getServletPath());
             filterChain.doFilter(request, response);
             return;
         }
@@ -54,7 +61,6 @@ public class JwtFilter extends OncePerRequestFilter {
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
             if (jwtService.isTokenValid(jwt, userDetails)) {
-                // ✅ Ajoute un log pour vérifier
                 System.out.println("🔍 User authentifié : " + userDetails.getUsername());
                 System.out.println("🔍 Authorities : " + userDetails.getAuthorities());
 
@@ -69,6 +75,8 @@ public class JwtFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
 
                 System.out.println("✅ Authentication set in SecurityContext");
+            } else {
+                System.out.println("❌ Token invalide pour: " + email);
             }
         }
 
