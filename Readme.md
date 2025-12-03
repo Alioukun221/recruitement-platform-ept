@@ -161,160 +161,6 @@ L'API sera accessible sur http://localhost:8080/api/v1
 - *Taille maximale des requêtes*: 5MB
 - Ajustable selon vos besoins dans application.properties
 
-## 📁 Structure du projet
-
-backend/
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/ept/recrutement/
-│   │   │       ├── auth/                    # Module d'authentification
-│   │   │       │   ├── controller/
-│   │   │       │   │   └── AuthController.java
-│   │   │       │   ├── dto/
-│   │   │       │   │   ├── LoginRequest.java
-│   │   │       │   │   ├── RegistrationRequest.java
-│   │   │       │   │   ├── RhRequest.java
-│   │   │       │   │   ├── CommissionMemberRequest.java
-│   │   │       │   │   └── AuthResponse.java
-│   │   │       │   └── service/
-│   │   │       │       └── AuthService.java
-│   │   │       │
-│   │   │       ├── candidat/                # Module candidat
-│   │   │       │   ├── controller/
-│   │   │       │   │   └── CandidateController.java
-│   │   │       │   ├── dto/
-│   │   │       │   │   ├── ApplicationSubmissionResponseDTO.java
-│   │   │       │   │   ├── CandidateApplicationHistoryDTO.java
-│   │   │       │   │   ├── CandidateApplicationDetailDTO.java
-│   │   │       │   │   ├── PublicJobOfferListDTO.java
-│   │   │       │   │   └── PublicJobOfferDetailDTO.java
-│   │   │       │   ├── service/
-│   │   │       │   │   └── CandidateService.java
-│   │   │       │   └── repository/
-│   │   │       │       └── ApplicationRepository.java
-│   │   │       │
-│   │   │       ├── commission/              # Module commission
-│   │   │       │   ├── controller/
-│   │   │       │   │   └── CommissionMemberController.java
-│   │   │       │   ├── dto/
-│   │   │       │   │   ├── MemberCommissionDTO.java
-│   │   │       │   │   ├── CommissionApplicationListDTO.java
-│   │   │       │   │   ├── CommissionApplicationDetailDTO.java
-│   │   │       │   │   ├── CreateEvaluationDTO.java
-│   │   │       │   │   ├── EvaluationResponseDTO.java
-│   │   │       │   │   └── EvaluationAverageDTO.java
-│   │   │       │   ├── service/
-│   │   │       │   │   ├── CommissionMemberService.java
-│   │   │       │   │   └── EvaluationService.java
-│   │   │       │   └── repository/
-│   │   │       │       ├── CommissionRepository.java
-│   │   │       │       └── EvaluationRepository.java
-│   │   │       │
-│   │   │       ├── config/                  # Configuration globale
-│   │   │       │   ├── SecurityConfig.java
-│   │   │       │   ├── JwtAuthenticationFilter.java
-│   │   │       │   ├── OpenApiConfig.java
-│   │   │       │   └── WebConfig.java
-│   │   │       │
-│   │   │       ├── dashboard/               # Module dashboard RH
-│   │   │       │   ├── controller/
-│   │   │       │   │   └── DashboardController.java
-│   │   │       │   ├── dto/
-│   │   │       │   │   ├── RHDashboardDTO.java
-│   │   │       │   │   ├── DashboardOverviewDTO.java
-│   │   │       │   │   ├── JobOfferStatsDTO.java
-│   │   │       │   │   ├── ApplicationStatsDTO.java
-│   │   │       │   │   ├── CommissionStatsDTO.java
-│   │   │       │   │   ├── TopJobOfferDTO.java
-│   │   │       │   │   ├── RecentActivityDTO.java
-│   │   │       │   │   └── DashboardAlertDTO.java
-│   │   │       │   └── service/
-│   │   │       │       └── DashboardService.java
-│   │   │       │
-│   │   │       ├── entity/                  # Entités JPA
-│   │   │       │   ├── User.java
-│   │   │       │   ├── Candidate.java
-│   │   │       │   ├── RH.java
-│   │   │       │   ├── CommissionMemberUser.java
-│   │   │       │   ├── JobOffer.java
-│   │   │       │   ├── Application.java
-│   │   │       │   ├── Commission.java
-│   │   │       │   ├── CommissionMember.java
-│   │   │       │   ├── Evaluation.java
-│   │   │       │   └── Token.java
-│   │   │       │
-│   │   │       ├── enums/                   # Énumérations
-│   │   │       │   ├── Role.java
-│   │   │       │   ├── JobType.java
-│   │   │       │   ├── TypeContrat.java
-│   │   │       │   ├── JobStatus.java
-│   │   │       │   ├── ApplicationStatus.java
-│   │   │       │   └── CommissionStatus.java
-│   │   │       │
-│   │   │       ├── exception/               # Gestion des exceptions
-│   │   │       │   ├── GlobalExceptionHandler.java
-│   │   │       │   ├── ResourceNotFoundException.java
-│   │   │       │   ├── UnauthorizedException.java
-│   │   │       │   ├── BadRequestException.java
-│   │   │       │   └── ErrorResponse.java
-│   │   │       │
-│   │   │       ├── ia/                      # Module IA
-│   │   │       │   ├── controller/
-│   │   │       │   │   └── WebhookController.java
-│   │   │       │   ├── dto/
-│   │   │       │   │   ├── ProcessCVResponseDTO.java
-│   │   │       │   │   └── IAScoringResultDTO.java
-│   │   │       │   └── service/
-│   │   │       │       └── IAService.java
-│   │   │       │
-│   │   │       ├── rh/                      # Module RH
-│   │   │       │   ├── controller/
-│   │   │       │   │   ├── JobOfferController.java
-│   │   │       │   │   ├── ApplicationController.java
-│   │   │       │   │   └── CommissionController.java
-│   │   │       │   ├── dto/
-│   │   │       │   │   ├── CreateJobOfferDTO.java
-│   │   │       │   │   ├── UpdateJobOfferDTO.java
-│   │   │       │   │   ├── JobOfferResponseDTO.java
-│   │   │       │   │   ├── JobOfferListDTO.java
-│   │   │       │   │   ├── ApplicationDetailDTO.java
-│   │   │       │   │   ├── ApplicationListDTO.java
-│   │   │       │   │   ├── UpdateApplicationStatusDTO.java
-│   │   │       │   │   ├── ShortlistApplicationsDTO.java
-│   │   │       │   │   ├── CreateCommissionDTO.java
-│   │   │       │   │   ├── UpdateCommissionDTO.java
-│   │   │       │   │   ├── CommissionResponseDTO.java
-│   │   │       │   │   ├── CommissionListDTO.java
-│   │   │       │   │   ├── AddCommissionMemberDTO.java
-│   │   │       │   │   └── CommissionMemberResponseDTO.java
-│   │   │       │   ├── service/
-│   │   │       │   │   ├── JobOfferService.java
-│   │   │       │   │   ├── ApplicationService.java
-│   │   │       │   │   └── CommissionService.java
-│   │   │       │   └── repository/
-│   │   │       │       ├── JobOfferRepository.java
-│   │   │       │       └── CommissionMemberRepository.java
-│   │   │       │
-│   │   │       └── RecrutementApplication.java
-│   │   │
-│   │   └── resources/
-│   │       ├── application.properties
-│   │       └── static/
-│   │
-│   └── test/
-│       └── java/
-│           └── com/ept/recrutement/
-│               ├── auth/
-│               ├── candidat/
-│               ├── commission/
-│               ├── rh/
-│               └── ia/
-│
-├── pom.xml
-└── README.md
-
-
 ### Description des modules
 
 #### 📦 *auth* - Authentification
@@ -560,3 +406,255 @@ Fa Syaka Diouf -  fsd@ept.sn
 
 
 Note: Ce projet est développé dans le cadre du système de recrutement de l'École Polytechnique de Thiès.
+
+
+# 🤖 Service IA de Recrutement
+
+Service d'intelligence artificielle pour l'analyse et le scoring automatique de CV utilisant Mistral AI.
+
+## 📋 Description
+
+Ce service FastAPI offre des capacités d'analyse de CV par IA :
+- Parsing de CV : Extraction structurée des informations (expériences, compétences, formations, etc.)
+- Scoring automatique : Évaluation de la pertinence d'un candidat par rapport à une offre d'emploi
+- Traitement complet : Pipeline intégré parsing + scoring avec callback asynchrone
+
+## 🚀 Fonctionnalités
+
+### Parsing de CV
+- Extraction automatique des données structurées depuis des CV PDF
+- Support de l'OCR pour les documents scannés via Mistral AI
+- Analyse des sections : expériences, formations, compétences, projets, langues, certifications
+
+### Scoring Intelligent
+- Évaluation multi-critères (compétences, expérience, diplôme)
+- Score global de pertinence (0-100)
+- Recommandations automatiques (EXCELLENT, BON, MOYEN, FAIBLE)
+- Analyse détaillée des forces, faiblesses et compétences manquantes
+
+### Intégration
+- API REST complète avec documentation OpenAPI
+- Support des callbacks asynchrones pour intégration avec Spring Boot
+- Traitement en arrière-plan avec BackgroundTasks
+
+## 🛠 Technologies
+
+- Framework : FastAPI 0.115.0
+- Serveur : Uvicorn 0.32.0
+- IA : Mistral AI 1.9.10
+- Validation : Pydantic 2.10.3
+- HTTP Async : httpx >= 0.28.1
+- Retry Logic : Tenacity 9.0.0
+- Configuration : python-dotenv 1.0.1
+- Logging : python-json-logger 3.1.0
+
+## 📦 Installation
+
+### Prérequis
+- Python 3.9+
+- Clé API Mistral AI
+
+### Configuration
+
+1. Cloner le projet
+   bash
+   git clone <repository-url>
+   cd ia-service
+
+
+2. Créer un environnement virtuel
+   bash
+   python -m venv venv
+   source venv/bin/activate  # Linux/Mac
+   venv\Scripts\activate     # Windows
+
+
+3. Installer les dépendances
+   bash
+   pip install -r requirements.txt
+
+
+4. Configurer les variables d'environnement
+
+Créer un fichier .env à la racine :
+env
+MISTRAL_API_KEY=your_mistral_api_key_here
+
+
+## 🎯 Utilisation
+
+### Démarrage du service
+
+bash
+# Mode développement (avec rechargement automatique)
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+# Mode production
+uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
+
+
+Le service sera accessible sur http://localhost:8000
+
+### Documentation API
+
+Une fois le service démarré, accédez à :
+- Swagger UI : http://localhost:8000/docs
+- ReDoc : http://localhost:8000/redoc
+
+## 📡 Endpoints
+
+### Root
+http
+GET /
+
+Informations sur le service et ses endpoints.
+
+### Health Check
+http
+GET /health
+
+Vérification de l'état du service et de l'API Mistral.
+
+Réponse :
+json
+{
+"status": "healthy",
+"timestamp": "2024-12-03T10:30:00",
+"version": "1.0.0",
+"mistral_api_status": "OCR: OK, Chat: OK"
+}
+
+
+### Traitement Complet (Parsing + Scoring)
+http
+POST /api/ia/process-cv
+
+
+Requête :
+json
+{
+"application_id": 25,
+"cv_base64": "JVBERi0xLjQKJeLjz9MK...",
+"filename": "cv_candidat.pdf",
+"job_offer": {
+"job_id": 1,
+"job_title": "Développeur Full Stack",
+"job_type": "FULL_TIME",
+"contract_type": "CDI",
+"description": "Nous recherchons un développeur...",
+"required_skills": ["Python", "FastAPI", "React", "PostgreSQL"],
+"education_level": "Master en Informatique",
+"min_experience": 3
+},
+"callback_url": "http://localhost:8080/api/webhook/ia-result"
+}
+
+
+Réponse :
+json
+{
+"success": true,
+"application_id": 25,
+"scoring_result": {
+"score_global": 85.5,
+"matching_competences": 90.0,
+"matching_experience": 85.0,
+"matching_diploma": 80.0,
+"justification": "Le candidat présente un excellent profil...",
+"recommendation": "EXCELLENT",
+"strengths": [
+"Solide expérience en développement web",
+"Maîtrise des technologies requises"
+],
+"weaknesses": [
+"Peu d'expérience en gestion d'équipe"
+],
+"missing_skills": ["Kubernetes"]
+},
+"error_message": null,
+"total_processing_time": 5.7
+}
+
+
+## 🏗 Architecture
+
+
+ia-service/
+├── main.py              # Point d'entrée FastAPI
+├── models.py            # Modèles Pydantic
+├── services/
+│   ├── _init_.py
+│   ├── cv_parsing.py    # Service de parsing
+│   └── cv_scoring.py    # Service de scoring
+├── requirements.txt
+├── .env
+├── .gitignore
+└── README.md
+
+
+
+
+
+## 📊 Modèles de Données
+
+### ResumeData
+Données structurées extraites du CV :
+- Formations (diplômes, établissements, années)
+- Expériences professionnelles (postes, entreprises, durées, réalisations)
+- Projets (nom, description, technologies, rôle)
+- Compétences techniques et soft skills
+- Langues et certifications
+- Résumé professionnel
+
+### ScoringResult
+Résultat de l'évaluation :
+- Scores détaillés (compétences, expérience, diplôme)
+- Score global (0-100)
+- Recommandation (EXCELLENT/BON/MOYEN/FAIBLE)
+- Analyse : forces, faiblesses, compétences manquantes
+
+## 🔒 Sécurité
+
+- ✅ Validation stricte des données avec Pydantic
+- ✅ Gestion sécurisée des clés API via variables d'environnement
+- ✅ CORS configuré (à restreindre en production)
+- ✅ Gestion des erreurs centralisée
+- ✅ Logging des opérations sensibles
+
+## 📈 Performance
+
+- Parsing : ~2-4 secondes par CV
+- Scoring : ~2-3 secondes par évaluation
+- Traitement complet : ~5-7 secondes
+
+Temps variable selon la complexité du CV et la charge de l'API Mistral
+
+## 🐛 Dépannage
+
+### Erreur : "MISTRAL_API_KEY non trouvée"
+➡ Vérifier que le fichier .env existe et contient la clé API
+
+### Erreur : "Service unhealthy"
+➡ Vérifier la connexion à l'API Mistral et la validité de la clé
+
+### Timeout lors du traitement
+➡ Augmenter le timeout dans la configuration httpx (défaut: 30s)
+
+## 📝 Licence
+
+Ce projet est sous licence MIT.
+
+## 👥 Contribution
+
+Les contributions sont les bienvenues ! Merci de :
+1. Forker le projet
+2. Créer une branche (git checkout -b feature/amelioration)
+3. Commiter les changements (git commit -m 'Ajout fonctionnalité')
+4. Pousser la branche (git push origin feature/amelioration)
+5. Ouvrir une Pull Request
+
+
+---
+
+Version : 1.0.0  
+Dernière mise à jour : Décembre 2025
