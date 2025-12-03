@@ -1,6 +1,6 @@
 Backend du Site de Recrutement - EPT
 API backend pour la gestion du recrutement à l'École Polytechnique de Thiès (EPT), développée avec Spring Boot.
-📋 Table des matières
+📋Table des matières
 
 Vue d'ensemble
 Fonctionnalités
@@ -577,8 +577,6 @@ json
 
 
 ## 🏗 Architecture
-
-
 ia-service/
 ├── main.py              # Point d'entrée FastAPI
 ├── models.py            # Modèles Pydantic
